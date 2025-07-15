@@ -19,13 +19,15 @@
             display: flex;
             align-items: center;
         }
-        .login-box {
-            max-width: 400px;
+        .login-container {
+            max-width: 450px;
             margin: 0 auto;
             padding: 2rem;
             background: white;
             border-radius: 12px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
         .step {
             display: none;
@@ -38,6 +40,9 @@
             background-color: var(--primary);
             border: none;
             padding: 0.6rem;
+        }
+        .btn-primary:hover {
+            background-color: #e05a2b;
         }
         .verified-badge {
             background: #e8f5e9;
@@ -64,28 +69,83 @@
             height: 50px;
             margin-bottom: 1.5rem;
         }
-        #firebaseui-auth-container {
+        .google-btn {
+            background-color: white;
+            color: #757575;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
             margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .google-btn:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .google-btn.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .google-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #6c757d;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .divider::before {
+            margin-right: 1rem;
+        }
+        .divider::after {
+            margin-left: 1rem;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+        }
+        @media (max-width: 576px) {
+            .login-container {
+                padding: 1.5rem;
+                margin: 0 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="login-box animate__animated animate__fadeIn">
+        <div class="login-container animate__animated animate__fadeIn">
             <img src="logoh.png" alt="ISR Logo" class="logo d-block mx-auto">
             
             <!-- Step 1: Email -->
             <div class="step active" id="step1">
                 <h5 class="text-center mb-4">Enter your email</h5>
                 <div class="mb-3">
-                    <input type="email" class="form-control" id="email" placeholder="your@email.com">
+                    <input type="email" class="form-control" id="email" placeholder="your@email.com" autocomplete="email">
                     <div class="invalid-feedback">Please enter a valid email</div>
                 </div>
                 <button class="btn btn-primary w-100" id="verifyBtn">Verify Email</button>
-                <div class="text-center mt-3">
-                    <p>Or sign in with:</p>
-                    <div id="firebaseui-auth-container"></div>
-                </div>
+                
+                <div class="divider">or</div>
+                
+                <button id="googleSignInBtn" class="google-btn disabled" disabled>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" class="google-icon" alt="Google logo">
+                    Sign in with Google
+                </button>
             </div>
             
             <!-- Step 2: Product -->
@@ -97,6 +157,9 @@
                 <h5 class="text-center mb-4">Select your product</h5>
                 <select class="form-select mb-3" id="product">
                     <option selected disabled>Choose product</option>
+                    <option value="Product A">Product A</option>
+                    <option value="Product B">Product B</option>
+                    <option value="Product C">Product C</option>
                 </select>
                 <button class="btn btn-outline-secondary w-100" id="backBtn1"><i class="fas fa-arrow-left me-2"></i>Back</button>
             </div>
@@ -106,7 +169,7 @@
                 <h5 class="text-center mb-3" id="productTitle"></h5>
                 <p class="text-center text-muted mb-4">Enter your access code</p>
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="accessCode" placeholder="6-digit code">
+                    <input type="text" class="form-control" id="accessCode" placeholder="6-digit code" maxlength="6">
                     <div class="invalid-feedback">Invalid access code</div>
                 </div>
                 <button class="btn btn-primary w-100 mb-2" id="submitCode">Continue</button>
@@ -127,13 +190,14 @@
     </div>
 
     <!-- Firebase SDKs -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import * as firebaseui from 'https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js';
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Replace with your deployed Web App URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuryEHpJIuiSWGbh60Vi9sTu1zcvJIQhc_8_-NL2mfQFt1qJJl8CkZLivfF4VcwNbkbw/exec";
         
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBp1bZZk7S11oIo6jBQKj1jjP78OXgqPa4",
             authDomain: "isr-project-3dc62.firebaseapp.com",
@@ -144,48 +208,9 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-        
-        // Initialize FirebaseUI
-        const uiConfig = {
-            signInOptions: [
-                {
-                    provider: GoogleAuthProvider.PROVIDER_ID,
-                    requireDisplayName: false
-                }
-            ],
-            signInSuccessUrl: '#', // We'll handle redirect manually
-            callbacks: {
-                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-                    // Handle successful sign-in
-                    handleFirebaseLogin(authResult.user.email);
-                    return false; // Prevent default redirect
-                }
-            }
-        };
-        
-        const ui = new firebaseui.auth.AuthUI(auth);
-        ui.start('#firebaseui-auth-container', uiConfig);
-        
-        // Check auth state
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                handleFirebaseLogin(user.email);
-            }
-        });
-        
-        function handleFirebaseLogin(email) {
-            document.getElementById('email').value = email;
-            document.getElementById('verifyBtn').click();
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Replace with your deployed Web App URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuryEHpJIuiSWGbh60Vi9sTu1zcvJIQhc_8_-NL2mfQFt1qJJl8CkZLivfF4VcwNbkbw/exec";
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
         
         document.addEventListener('DOMContentLoaded', function() {
             // DOM elements
@@ -196,6 +221,8 @@
             const submitCode = document.getElementById('submitCode');
             const productSelect = document.getElementById('product');
             const productTitle = document.getElementById('productTitle');
+            const googleSignInBtn = document.getElementById('googleSignInBtn');
+            const emailInput = document.getElementById('email');
             let currentEmail = "";
             let redirectUrl = "";
             let expectedAccessCode = "";
@@ -206,50 +233,89 @@
                 document.getElementById(`step${stepNumber}`).classList.add('active');
             }
             
-            // Verify email
-            verifyBtn.addEventListener('click', function() {
-                const email = document.getElementById('email').value;
+            // Enable Google sign-in button when email is valid
+            emailInput.addEventListener('input', function() {
+                const isValidEmail = this.value.includes('@');
+                googleSignInBtn.disabled = !isValidEmail;
+                googleSignInBtn.classList.toggle('disabled', !isValidEmail);
+                this.classList.remove('is-invalid');
+            });
+            
+            // Google sign-in handler
+            googleSignInBtn.addEventListener('click', function() {
+                auth.signInWithPopup(provider)
+                    .then((result) => {
+                        const user = result.user;
+                        emailInput.value = user.email;
+                        verifyEmail(user.email);
+                    })
+                    .catch((error) => {
+                        console.error('Google sign-in error:', error);
+                        alert('Error signing in with Google');
+                    });
+            });
+            
+            // Verify email function (used by both email and Google sign-in)
+            function verifyEmail(email) {
                 if (!email.includes('@')) {
-                    document.getElementById('email').classList.add('is-invalid');
+                    emailInput.classList.add('is-invalid');
                     return;
                 }
                 
                 // Show loading
-                this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Verifying...';
-                this.disabled = true;
+                verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Verifying...';
+                verifyBtn.disabled = true;
                 
-                // Call Google Apps Script
-                fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        this.innerHTML = 'Verify Email';
-                        this.disabled = false;
-                        
-                        if (data.success) {
-                            currentEmail = email;
-                            document.getElementById('userEmail').textContent = email;
+                // Simulate API call (replace with actual fetch to your backend)
+                setTimeout(() => {
+                    verifyBtn.innerHTML = 'Verify Email';
+                    verifyBtn.disabled = false;
+                    
+                    // For demo purposes - in real app, you would check against your database
+                    currentEmail = email;
+                    document.getElementById('userEmail').textContent = email;
+                    goToStep(2);
+                    
+                    // In a real app, you would do something like:
+                    /*
+                    fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            verifyBtn.innerHTML = 'Verify Email';
+                            verifyBtn.disabled = false;
                             
-                            // Populate products dropdown
-                            productSelect.innerHTML = '<option selected disabled>Choose product</option>';
-                            data.products.forEach(product => {
-                                const option = document.createElement('option');
-                                option.value = product;
-                                option.textContent = product;
-                                productSelect.appendChild(option);
-                            });
-                            
-                            goToStep(2);
-                        } else {
-                            document.getElementById('email').classList.add('is-invalid');
-                            alert('Email not found in our system');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        this.innerHTML = 'Verify Email';
-                        this.disabled = false;
-                        alert('Error verifying email');
-                    });
+                            if (data.success) {
+                                currentEmail = email;
+                                document.getElementById('userEmail').textContent = email;
+                                
+                                // Populate products dropdown
+                                productSelect.innerHTML = '<option selected disabled>Choose product</option>';
+                                data.products.forEach(product => {
+                                    const option = document.createElement('option');
+                                    option.value = product;
+                                    option.textContent = product;
+                                    productSelect.appendChild(option);
+                                });
+                                
+                                goToStep(2);
+                            } else {
+                                emailInput.classList.add('is-invalid');
+                                alert('Email not found in our system');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            verifyBtn.innerHTML = 'Verify Email';
+                            verifyBtn.disabled = false;
+                            alert('Error verifying email');
+                        });
+                    */
+                }, 1500);
+            }
+            
+            // Verify email button
+            verifyBtn.addEventListener('click', function() {
+                verifyEmail(emailInput.value);
             });
             
             // Back to email
@@ -260,25 +326,35 @@
                 if (this.value) {
                     productTitle.textContent = this.value;
                     
-                    // Get access code from Google Sheet
-                    fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(this.value)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Store redirect URL and access code for later
-                                redirectUrl = data.redirectUrl;
-                                expectedAccessCode = data.accessCode;
-                                goToStep(3);
-                            } else {
+                    // Simulate getting access code (replace with actual fetch to your backend)
+                    setTimeout(() => {
+                        // For demo purposes - in real app, you would get this from your backend
+                        expectedAccessCode = "123456"; // Example code
+                        redirectUrl = "https://example.com"; // Example redirect
+                        goToStep(3);
+                        
+                        // In a real app, you would do something like:
+                        /*
+                        fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(this.value)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Store redirect URL and access code for later
+                                    redirectUrl = data.redirectUrl;
+                                    expectedAccessCode = data.accessCode;
+                                    goToStep(3);
+                                } else {
+                                    alert('Error getting product information');
+                                    this.value = '';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
                                 alert('Error getting product information');
                                 this.value = '';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Error getting product information');
-                            this.value = '';
-                        });
+                            });
+                        */
+                    }, 1000);
                 }
             });
             
@@ -304,10 +380,6 @@
             });
             
             // Clear validation on input
-            document.getElementById('email').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-            });
-            
             document.getElementById('accessCode').addEventListener('input', function() {
                 this.classList.remove('is-invalid');
             });
