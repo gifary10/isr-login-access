@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISR Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --light: #FFF8F0;
+        }
+        body {
+            background-color: var(--light);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .login-box {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .step {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+        .step.active {
+            display: block;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 0.6rem;
+        }
+        .verified-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .logo {
+            height: 50px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-box animate__animated animate__fadeIn">
+            <img src="logoh.png" alt="ISR Logo" class="logo d-block mx-auto">
+            
+            <!-- Step 1: Email -->
+            <div class="step active" id="step1">
+                <h5 class="text-center mb-4">Enter your email</h5>
+                <div class="mb-3">
+                    <input type="email" class="form-control" id="email" placeholder="your@email.com">
+                    <div class="invalid-feedback">Please enter a valid email</div>
+                </div>
+                <button class="btn btn-primary w-100" id="verifyBtn">Verify Email</button>
+            </div>
+            
+            <!-- Step 2: Product -->
+            <div class="step" id="step2">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <small id="userEmail" class="text-muted"></small>
+                    <span class="verified-badge"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                </div>
+                <h5 class="text-center mb-4">Select your product</h5>
+                <select class="form-select mb-3" id="product">
+                    <option selected disabled>Choose product</option>
+                </select>
+                <button class="btn btn-outline-secondary w-100" id="backBtn1"><i class="fas fa-arrow-left me-2"></i>Back</button>
+            </div>
+            
+            <!-- Step 3: Access Code -->
+            <div class="step" id="step3">
+                <h5 class="text-center mb-3" id="productTitle"></h5>
+                <p class="text-center text-muted mb-4">Enter your access code</p>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="accessCode" placeholder="6-digit code">
+                    <div class="invalid-feedback">Invalid access code</div>
+                </div>
+                <button class="btn btn-primary w-100 mb-2" id="submitCode">Continue</button>
+                <button class="btn btn-outline-secondary w-100" id="backBtn2"><i class="fas fa-arrow-left me-2"></i>Back</button>
+            </div>
+            
+            <!-- Step 4: Redirect -->
+            <div class="step" id="step4">
+                <h5 class="text-center mb-3">Access Granted!</h5>
+                <p class="text-center text-muted mb-4">You will be redirected shortly</p>
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Replace with your deployed Web App URL
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuryEHpJIuiSWGbh60Vi9sTu1zcvJIQhc_8_-NL2mfQFt1qJJl8CkZLivfF4VcwNbkbw/exec";
+            
+            // DOM elements
+            const steps = document.querySelectorAll('.step');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const backBtn1 = document.getElementById('backBtn1');
+            const backBtn2 = document.getElementById('backBtn2');
+            const submitCode = document.getElementById('submitCode');
+            const productSelect = document.getElementById('product');
+            const productTitle = document.getElementById('productTitle');
+            let currentEmail = "";
+            let redirectUrl = "";
+            
+            // Switch between steps
+            function goToStep(stepNumber) {
+                steps.forEach(step => step.classList.remove('active'));
+                document.getElementById(`step${stepNumber}`).classList.add('active');
+            }
+            
+            // Verify email
+            verifyBtn.addEventListener('click', function() {
+                const email = document.getElementById('email').value;
+                if (!email.includes('@')) {
+                    document.getElementById('email').classList.add('is-invalid');
+                    return;
+                }
+                
+                // Show loading
+                this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Verifying...';
+                this.disabled = true;
+                
+                // Call Google Apps Script
+                fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.innerHTML = 'Verify Email';
+                        this.disabled = false;
+                        
+                        if (data.success) {
+                            currentEmail = email;
+                            document.getElementById('userEmail').textContent = email;
+                            
+                            // Populate products dropdown
+                            productSelect.innerHTML = '<option selected disabled>Choose product</option>';
+                            data.products.forEach(product => {
+                                const option = document.createElement('option');
+                                option.value = product;
+                                option.textContent = product;
+                                productSelect.appendChild(option);
+                            });
+                            
+                            goToStep(2);
+                        } else {
+                            document.getElementById('email').classList.add('is-invalid');
+                            alert('Email not found in our system');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.innerHTML = 'Verify Email';
+                        this.disabled = false;
+                        alert('Error verifying email');
+                    });
+            });
+            
+            // Back to email
+            backBtn1.addEventListener('click', () => goToStep(1));
+            
+            // Product selected
+            productSelect.addEventListener('change', function() {
+                if (this.value) {
+                    productTitle.textContent = this.value;
+                    
+                    // Get access code from Google Sheet
+                    fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(this.value)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Store redirect URL for later
+                                redirectUrl = data.redirectUrl;
+                                goToStep(3);
+                            } else {
+                                alert('Error getting product information');
+                                this.value = '';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error getting product information');
+                            this.value = '';
+                        });
+                }
+            });
+            
+            // Back to product
+            backBtn2.addEventListener('click', () => goToStep(2));
+            
+            // Submit access code
+            submitCode.addEventListener('click', function() {
+                const accessCode = document.getElementById('accessCode').value;
+                const expectedCode = "123456"; // This would normally come from the API response
+                
+                if (!accessCode) {
+                    document.getElementById('accessCode').classList.add('is-invalid');
+                    return;
+                }
+                
+                // In a real implementation, you would verify the code with your backend
+                // For this demo, we'll just proceed if any code is entered
+                goToStep(4);
+                
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 2000);
+            });
+            
+            // Clear validation on input
+            document.getElementById('email').addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
+            
+            document.getElementById('accessCode').addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
+        });
+    </script>
+</body>
+</html>
