@@ -64,6 +64,9 @@
             height: 50px;
             margin-bottom: 1.5rem;
         }
+        #firebaseui-auth-container {
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -79,6 +82,10 @@
                     <div class="invalid-feedback">Please enter a valid email</div>
                 </div>
                 <button class="btn btn-primary w-100" id="verifyBtn">Verify Email</button>
+                <div class="text-center mt-3">
+                    <p>Or sign in with:</p>
+                    <div id="firebaseui-auth-container"></div>
+                </div>
             </div>
             
             <!-- Step 2: Product -->
@@ -119,12 +126,68 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import * as firebaseui from 'https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js';
+        
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp1bZZk7S11oIo6jBQKj1jjP78OXgqPa4",
+            authDomain: "isr-project-3dc62.firebaseapp.com",
+            projectId: "isr-project-3dc62",
+            storageBucket: "isr-project-3dc62.appspot.com",
+            messagingSenderId: "549792110057",
+            appId: "1:549792110057:web:b8e36a02549cd48753e778"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        
+        // Initialize FirebaseUI
+        const uiConfig = {
+            signInOptions: [
+                {
+                    provider: GoogleAuthProvider.PROVIDER_ID,
+                    requireDisplayName: false
+                }
+            ],
+            signInSuccessUrl: '#', // We'll handle redirect manually
+            callbacks: {
+                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                    // Handle successful sign-in
+                    handleFirebaseLogin(authResult.user.email);
+                    return false; // Prevent default redirect
+                }
+            }
+        };
+        
+        const ui = new firebaseui.auth.AuthUI(auth);
+        ui.start('#firebaseui-auth-container', uiConfig);
+        
+        // Check auth state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                handleFirebaseLogin(user.email);
+            }
+        });
+        
+        function handleFirebaseLogin(email) {
+            document.getElementById('email').value = email;
+            document.getElementById('verifyBtn').click();
+        }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Replace with your deployed Web App URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuryEHpJIuiSWGbh60Vi9sTu1zcvJIQhc_8_-NL2mfQFt1qJJl8CkZLivfF4VcwNbkbw/exec";
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // Replace with your deployed Web App URL
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuryEHpJIuiSWGbh60Vi9sTu1zcvJIQhc_8_-NL2mfQFt1qJJl8CkZLivfF4VcwNbkbw/exec";
-            
             // DOM elements
             const steps = document.querySelectorAll('.step');
             const verifyBtn = document.getElementById('verifyBtn');
@@ -135,6 +198,7 @@
             const productTitle = document.getElementById('productTitle');
             let currentEmail = "";
             let redirectUrl = "";
+            let expectedAccessCode = "";
             
             // Switch between steps
             function goToStep(stepNumber) {
@@ -201,8 +265,9 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Store redirect URL for later
+                                // Store redirect URL and access code for later
                                 redirectUrl = data.redirectUrl;
+                                expectedAccessCode = data.accessCode;
                                 goToStep(3);
                             } else {
                                 alert('Error getting product information');
@@ -223,15 +288,13 @@
             // Submit access code
             submitCode.addEventListener('click', function() {
                 const accessCode = document.getElementById('accessCode').value;
-                const expectedCode = "123456"; // This would normally come from the API response
                 
-                if (!accessCode) {
-                    document.getElementById('accessCode').classList.add('is-invalid');
+                if (!accessCode || accessCode !== expectedAccessCode) {
+                    document.getElementById('accessCode').classList.add('is-invalid', 'shake');
+                    setTimeout(() => document.getElementById('accessCode').classList.remove('shake'), 500);
                     return;
                 }
                 
-                // In a real implementation, you would verify the code with your backend
-                // For this demo, we'll just proceed if any code is entered
                 goToStep(4);
                 
                 // Redirect after 2 seconds
