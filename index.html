@@ -543,6 +543,33 @@
             document.getElementById('accessCode').addEventListener('input', function() {
                 this.classList.remove('is-invalid');
             });
+            // Disable continue button until Google Sign-In
+verifyBtn.disabled = true;
+
+// Enable button after Google Sign-In
+googleSignInBtn.addEventListener('click', function() {
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            const user = result.user;
+            emailInput.value = user.email;
+            verifyBtn.disabled = false; // <-- Aktifkan tombol di sini
+            verifyEmail(user.email);
+        })
+        .catch((error) => {
+            console.error('Google sign-in error:', error);
+            alert('Error signing in with Google');
+        });
+});
+
+// Prevent click if belum login (extra validation)
+verifyBtn.addEventListener('click', function() {
+    if (verifyBtn.disabled) {
+        alert('Please login with Google first');
+        return;
+    }
+    verifyEmail(emailInput.value);
+});
+
         });
     </script>
 </body>
