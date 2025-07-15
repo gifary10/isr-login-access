@@ -10,71 +10,164 @@
     <style>
         :root {
             --primary: #FF6B35;
+            --secondary: #004E89;
             --light: #FFF8F0;
+            --dark: #333333;
+            --success: #2e7d32;
         }
+        
         body {
-            background-color: var(--light);
-            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            color: var(--dark);
         }
+        
+        header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0;
+        }
+        
         .login-container {
             max-width: 450px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2.5rem;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             position: relative;
             overflow: hidden;
         }
-        .step {
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .logo {
+            height: 60px;
+            margin-bottom: 2rem;
+            transition: transform 0.3s;
+        }
+        
+        .form-section {
             display: none;
             animation: fadeIn 0.4s;
         }
-        .step.active {
+        
+        .form-section.active {
             display: block;
         }
+        
+        .form-title {
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-subtitle {
+            color: #6c757d;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-control {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.15);
+        }
+        
         .btn-primary {
             background-color: var(--primary);
             border: none;
-            padding: 0.6rem;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
         }
+        
         .btn-primary:hover {
             background-color: #e05a2b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
         }
+        
+        .btn-outline-secondary {
+            border: 1px solid #e0e0e0;
+            color: var(--dark);
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: #d0d0d0;
+        }
+        
         .verified-badge {
             background: #e8f5e9;
-            color: #2e7d32;
-            padding: 0.3rem 0.8rem;
+            color: var(--success);
+            padding: 0.4rem 1rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
+            font-weight: 500;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .shake {
-            animation: shake 0.5s;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-        .logo {
-            height: 50px;
-            margin-bottom: 1.5rem;
-        }
+        
         .google-btn {
             background-color: white;
-            color: #757575;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
+            color: #5f6368;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
             width: 100%;
             text-align: center;
             cursor: pointer;
@@ -83,120 +176,199 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 500;
         }
+        
         .google-btn:hover {
             background-color: #f8f9fa;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
         }
-        .google-btn.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+        
         .google-icon {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
         }
+        
         .divider {
             display: flex;
             align-items: center;
-            margin: 1.5rem 0;
-            color: #6c757d;
+            margin: 1.75rem 0;
+            color: #9e9e9e;
+            font-size: 0.9rem;
         }
+        
         .divider::before, .divider::after {
             content: "";
             flex: 1;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid #e0e0e0;
         }
+        
         .divider::before {
             margin-right: 1rem;
         }
+        
         .divider::after {
             margin-left: 1rem;
         }
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+        
+        .invalid-feedback {
+            font-size: 0.85rem;
         }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .spinner-container {
+            display: none;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .spinner-container p {
+            margin-top: 1rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .user-email {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .back-btn-icon {
+            margin-right: 8px;
+        }
+        
         @media (max-width: 576px) {
             .login-container {
-                padding: 1.5rem;
+                padding: 2rem 1.5rem;
                 margin: 0 1rem;
+            }
+            
+            .logo {
+                height: 50px;
+                margin-bottom: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="login-container animate__animated animate__fadeIn">
-            <img src="logoh.png" alt="ISR Logo" class="logo d-block mx-auto">
-            
-            <!-- Step 1: Email -->
-            <div class="step active" id="step1">
-                <h5 class="text-center mb-4">Enter your email</h5>
-                <div class="mb-3">
-                    <input type="email" class="form-control" id="email" placeholder="your@email.com" autocomplete="email">
-                    <div class="invalid-feedback">Please enter a valid email</div>
-                </div>
-                <button class="btn btn-primary w-100" id="verifyBtn">Verify Email</button>
+    <header>
+        <div class="header-container d-flex justify-content-between align-items-center">
+            <div>
+                <img src="logoh.png" alt="ISR Logo" style="height: 40px;">
+            </div>
+            <div>
+                <span class="fw-bold">ISR Login System</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="login-wrapper">
+        <div class="container">
+            <div class="login-container animate__animated animate__fadeIn">
+                <img src="logoh.png" alt="ISR Logo" class="logo d-block mx-auto">
                 
-                <div class="divider">or</div>
+                <!-- Email Section -->
+                <div class="form-section active" id="emailSection">
+                    <h3 class="form-title">Welcome to ISR</h3>
+                    <p class="form-subtitle">Enter your email to continue</p>
+                    
+                    <div class="mb-3">
+                        <input type="email" class="form-control" id="email" placeholder="your@email.com" autocomplete="email">
+                        <div class="invalid-feedback">Please enter a valid email address</div>
+                    </div>
+                    
+                    <button class="btn btn-primary w-100" id="verifyBtn">
+                        <span id="verifyBtnText">Continue</span>
+                        <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                    
+                    <div class="divider">or</div>
+                    
+                    <button id="googleSignInBtn" class="google-btn">
+                        <img src="google.png" class="google-icon" alt="Google logo">
+                        Continue with Google
+                    </button>
+                </div>
                 
-                <button id="googleSignInBtn" class="google-btn disabled" disabled>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" class="google-icon" alt="Google logo">
-                    Sign in with Google
-                </button>
-            </div>
-            
-            <!-- Step 2: Product -->
-            <div class="step" id="step2">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <small id="userEmail" class="text-muted"></small>
-                    <span class="verified-badge"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                <!-- Product Section -->
+                <div class="form-section" id="productSection">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span id="userEmail" class="user-email"></span>
+                        <span class="verified-badge"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                    </div>
+                    
+                    <h3 class="form-title">Select Your Product</h3>
+                    <p class="form-subtitle">Choose the product you want to access</p>
+                    
+                    <div class="mb-4">
+                        <select class="form-select" id="product">
+                            <option selected disabled>Select a product</option>
+                            <!-- Products will be loaded dynamically -->
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-outline-secondary w-100" id="backBtn1">
+                        <i class="fas fa-arrow-left back-btn-icon"></i>Back
+                    </button>
                 </div>
-                <h5 class="text-center mb-4">Select your product</h5>
-                <select class="form-select mb-3" id="product">
-                    <option selected disabled>Choose product</option>
-                    <option value="Product A">Product A</option>
-                    <option value="Product B">Product B</option>
-                    <option value="Product C">Product C</option>
-                </select>
-                <button class="btn btn-outline-secondary w-100" id="backBtn1"><i class="fas fa-arrow-left me-2"></i>Back</button>
-            </div>
-            
-            <!-- Step 3: Access Code -->
-            <div class="step" id="step3">
-                <h5 class="text-center mb-3" id="productTitle"></h5>
-                <p class="text-center text-muted mb-4">Enter your access code</p>
-                <div class="mb-3">
-                    <input type="text" class="form-control" id="accessCode" placeholder="6-digit code" maxlength="6">
-                    <div class="invalid-feedback">Invalid access code</div>
+                
+                <!-- Access Code Section -->
+                <div class="form-section" id="accessCodeSection">
+                    <h3 class="form-title" id="productTitle"></h3>
+                    <p class="form-subtitle">Enter your 6-digit access code</p>
+                    
+                    <div class="mb-4">
+                        <input type="text" class="form-control text-center" id="accessCode" placeholder="••••••" maxlength="6" style="letter-spacing: 5px; font-size: 1.2rem;">
+                        <div class="invalid-feedback">Please enter a valid access code</div>
+                    </div>
+                    
+                    <button class="btn btn-primary w-100 mb-3" id="submitCode">Submit</button>
+                    
+                    <button class="btn btn-outline-secondary w-100" id="backBtn2">
+                        <i class="fas fa-arrow-left back-btn-icon"></i>Back
+                    </button>
                 </div>
-                <button class="btn btn-primary w-100 mb-2" id="submitCode">Continue</button>
-                <button class="btn btn-outline-secondary w-100" id="backBtn2"><i class="fas fa-arrow-left me-2"></i>Back</button>
-            </div>
-            
-            <!-- Step 4: Redirect -->
-            <div class="step" id="step4">
-                <h5 class="text-center mb-3">Access Granted!</h5>
-                <p class="text-center text-muted mb-4">You will be redirected shortly</p>
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
+                
+                <!-- Loading Spinner -->
+                <div class="spinner-container" id="loadingSpinner">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
+                    <p>Preparing your access...</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2023 ISR System. All rights reserved.</p>
+            <p class="mb-0">Contact support: support@isr-system.com</p>
+        </div>
+    </footer>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Replace with your deployed Web App URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuryEHpJIuiSWGbh60Vi9sTu1zcvJIQhc_8_-NL2mfQFt1qJJl8CkZLivfF4VcwNbkbw/exec";
-        
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBp1bZZk7S11oIo6jBQKj1jjP78OXgqPa4",
@@ -212,10 +384,17 @@
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
         
+        // Google Sheets API endpoint
+        const SHEET_ID = "1e0-Z7QEPITaeVz2PR41Cj4Sujyjtrcxxo9PpqAmYrWo";
+        const SHEET_NAME = "master";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ0mkF-X5-0SPMf7Mg922MTnVsQNOZ7Nakeopu71qxm7EJR-Q9OGeBFLVdStF-Y62vSw/exec";
+        
         document.addEventListener('DOMContentLoaded', function() {
             // DOM elements
-            const steps = document.querySelectorAll('.step');
+            const sections = document.querySelectorAll('.form-section');
             const verifyBtn = document.getElementById('verifyBtn');
+            const verifyBtnText = document.getElementById('verifyBtnText');
+            const verifyBtnSpinner = document.getElementById('verifyBtnSpinner');
             const backBtn1 = document.getElementById('backBtn1');
             const backBtn2 = document.getElementById('backBtn2');
             const submitCode = document.getElementById('submitCode');
@@ -223,21 +402,21 @@
             const productTitle = document.getElementById('productTitle');
             const googleSignInBtn = document.getElementById('googleSignInBtn');
             const emailInput = document.getElementById('email');
+            const loadingSpinner = document.getElementById('loadingSpinner');
             let currentEmail = "";
-            let redirectUrl = "";
+            let userProducts = [];
             let expectedAccessCode = "";
+            let redirectUrl = "";
             
-            // Switch between steps
-            function goToStep(stepNumber) {
-                steps.forEach(step => step.classList.remove('active'));
-                document.getElementById(`step${stepNumber}`).classList.add('active');
+            // Switch between sections
+            function showSection(sectionId) {
+                sections.forEach(section => section.classList.remove('active'));
+                document.getElementById(sectionId).classList.add('active');
             }
             
             // Enable Google sign-in button when email is valid
             emailInput.addEventListener('input', function() {
                 const isValidEmail = this.value.includes('@');
-                googleSignInBtn.disabled = !isValidEmail;
-                googleSignInBtn.classList.toggle('disabled', !isValidEmail);
                 this.classList.remove('is-invalid');
             });
             
@@ -255,62 +434,52 @@
                     });
             });
             
-            // Verify email function (used by both email and Google sign-in)
+            // Verify email function
             function verifyEmail(email) {
                 if (!email.includes('@')) {
                     emailInput.classList.add('is-invalid');
                     return;
                 }
                 
-                // Show loading
-                verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Verifying...';
+                // Show loading state
+                verifyBtnText.textContent = 'Verifying...';
+                verifyBtnSpinner.classList.remove('d-none');
                 verifyBtn.disabled = true;
                 
-                // Simulate API call (replace with actual fetch to your backend)
-                setTimeout(() => {
-                    verifyBtn.innerHTML = 'Verify Email';
-                    verifyBtn.disabled = false;
-                    
-                    // For demo purposes - in real app, you would check against your database
-                    currentEmail = email;
-                    document.getElementById('userEmail').textContent = email;
-                    goToStep(2);
-                    
-                    // In a real app, you would do something like:
-                    /*
-                    fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            verifyBtn.innerHTML = 'Verify Email';
-                            verifyBtn.disabled = false;
+                // Check email in Google Sheet
+                fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        verifyBtnText.textContent = 'Continue';
+                        verifyBtnSpinner.classList.add('d-none');
+                        verifyBtn.disabled = false;
+                        
+                        if (data.success) {
+                            currentEmail = email;
+                            document.getElementById('userEmail').textContent = email;
                             
-                            if (data.success) {
-                                currentEmail = email;
-                                document.getElementById('userEmail').textContent = email;
-                                
-                                // Populate products dropdown
-                                productSelect.innerHTML = '<option selected disabled>Choose product</option>';
-                                data.products.forEach(product => {
-                                    const option = document.createElement('option');
-                                    option.value = product;
-                                    option.textContent = product;
-                                    productSelect.appendChild(option);
-                                });
-                                
-                                goToStep(2);
-                            } else {
-                                emailInput.classList.add('is-invalid');
-                                alert('Email not found in our system');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            verifyBtn.innerHTML = 'Verify Email';
-                            verifyBtn.disabled = false;
-                            alert('Error verifying email');
-                        });
-                    */
-                }, 1500);
+                            // Populate products dropdown
+                            productSelect.innerHTML = '<option selected disabled>Select a product</option>';
+                            data.products.forEach(product => {
+                                const option = document.createElement('option');
+                                option.value = product;
+                                option.textContent = product;
+                                productSelect.appendChild(option);
+                            });
+                            
+                            showSection('productSection');
+                        } else {
+                            emailInput.classList.add('is-invalid');
+                            alert('Email not found in our system');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        verifyBtnText.textContent = 'Continue';
+                        verifyBtnSpinner.classList.add('d-none');
+                        verifyBtn.disabled = false;
+                        alert('Error verifying email');
+                    });
             }
             
             // Verify email button
@@ -319,47 +488,36 @@
             });
             
             // Back to email
-            backBtn1.addEventListener('click', () => goToStep(1));
+            backBtn1.addEventListener('click', () => showSection('emailSection'));
             
             // Product selected
             productSelect.addEventListener('change', function() {
                 if (this.value) {
                     productTitle.textContent = this.value;
                     
-                    // Simulate getting access code (replace with actual fetch to your backend)
-                    setTimeout(() => {
-                        // For demo purposes - in real app, you would get this from your backend
-                        expectedAccessCode = "123456"; // Example code
-                        redirectUrl = "https://example.com"; // Example redirect
-                        goToStep(3);
-                        
-                        // In a real app, you would do something like:
-                        /*
-                        fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(this.value)}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    // Store redirect URL and access code for later
-                                    redirectUrl = data.redirectUrl;
-                                    expectedAccessCode = data.accessCode;
-                                    goToStep(3);
-                                } else {
-                                    alert('Error getting product information');
-                                    this.value = '';
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
+                    // Get access code for selected product
+                    fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(this.value)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                expectedAccessCode = data.accessCode;
+                                redirectUrl = data.redirectUrl;
+                                showSection('accessCodeSection');
+                            } else {
                                 alert('Error getting product information');
                                 this.value = '';
-                            });
-                        */
-                    }, 1000);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error getting product information');
+                            this.value = '';
+                        });
                 }
             });
             
             // Back to product
-            backBtn2.addEventListener('click', () => goToStep(2));
+            backBtn2.addEventListener('click', () => showSection('productSection'));
             
             // Submit access code
             submitCode.addEventListener('click', function() {
@@ -371,9 +529,11 @@
                     return;
                 }
                 
-                goToStep(4);
+                // Show loading spinner and hide form
+                sections.forEach(section => section.classList.remove('active'));
+                loadingSpinner.style.display = 'block';
                 
-                // Redirect after 2 seconds
+                // Redirect to the target URL
                 setTimeout(() => {
                     window.location.href = redirectUrl;
                 }, 2000);
