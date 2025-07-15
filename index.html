@@ -317,12 +317,12 @@
                     <p class="form-subtitle">Enter your email to continue</p>
                     
                     <div class="mb-3">
-                        <input type="email" class="form-control" id="email" placeholder="your@email.com" autocomplete="email">
+                        <input type="email" class="form-control" id="email" placeholder="your@email.com" autocomplete="email" disabled>
                         <div class="invalid-feedback">Please enter a valid email address</div>
                     </div>
                     
-                    <button class="btn btn-primary w-100" id="verifyBtn">
-                        <span id="verifyBtnText">Continue</span>
+                    <button class="btn btn-primary w-100" id="verifyBtn" disabled>
+                        <span id="verifyBtnText">Status Verifikasi</span>
                         <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
                     </button>
                     
@@ -425,7 +425,7 @@
         // Google Sheets API endpoint
         const SHEET_ID = "1e0-Z7QEPITaeVz2PR41Cj4Sujyjtrcxxo9PpqAmYrWo";
         const SHEET_NAME = "master";
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4dtaXncgUriXC5UrSiEamBnN6Lkhp2VCTn8nPogMfnXTPYJliqSFxHSpEWymoKxIK3w/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOJmtJClRaFKpThGB0ltnl-1w2ytoFQZKVXwRWtPgVvMKr9wf4Ti0nwNu2sfARSjnnCA/exec";
         
         document.addEventListener('DOMContentLoaded', function() {
             // DOM elements
