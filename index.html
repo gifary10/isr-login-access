@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ISR Login</title>
+    <title>ISR Login System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,6 +14,7 @@
             --light: #FFF8F0;
             --dark: #333333;
             --success: #2e7d32;
+            --danger: #d32f2f;
         }
         
         body {
@@ -23,13 +24,6 @@
             display: flex;
             flex-direction: column;
             color: var(--dark);
-        }
-        
-        header {
-            background-color: var(--secondary);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         
         .login-container {
@@ -50,17 +44,9 @@
             right: 0;
             height: 6px;
             background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 16px 16px 0 0;
         }
 
-        .form-section {
-            display: none;
-            animation: fadeIn 0.4s;
-        }
-        
-        .form-section.active {
-            display: block;
-        }
-        
         .form-title {
             color: var(--secondary);
             font-weight: 600;
@@ -73,26 +59,60 @@
             border: none;
             padding: 12px;
             font-weight: 500;
+            transition: all 0.3s;
         }
         
-        .verified-badge {
-            background: #e8f5e9;
-            color: var(--success);
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            display: inline-flex;
+        .btn-primary:hover {
+            background-color: #e05a2b;
+            transform: translateY(-2px);
+        }
+        
+        .access-code-display {
+            font-size: 2.5rem;
+            letter-spacing: 0.5rem;
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-weight: bold;
+            font-family: monospace;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .countdown-badge {
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .divider {
+            display: flex;
             align-items: center;
+            text-align: center;
+            color: #6c757d;
+            margin: 1.5rem 0;
         }
         
-        .shake {
-            animation: shake 0.5s;
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #dee2e6;
         }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+        .divider::before {
+            margin-right: 1rem;
+        }
+        
+        .divider::after {
+            margin-left: 1rem;
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            display: none;
         }
         
         @keyframes fadeIn {
@@ -103,100 +123,90 @@
         @media (max-width: 576px) {
             .login-container {
                 padding: 2rem 1.5rem;
-                margin: 0 1rem;
+                margin: 1rem;
             }
-        }
-
-        /* Modal Styling */
-        .modal-content {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .modal-header {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        
-        .access-code-display {
-            font-size: 2rem;
-            letter-spacing: 0.5rem;
-            text-align: center;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin: 1rem 0;
-            font-weight: bold;
+            
+            .access-code-display {
+                font-size: 1.8rem;
+                letter-spacing: 0.3rem;
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="bg-white text-dark">
-            <img src="logoh.png" alt="ISR Logo" style="height: 40px;">
-            <span class="fw-bold">ISR Login System</span>
+    <header class="bg-primary py-3">
+        <div class="container d-flex align-items-center">
+            <img src="logoh.png" alt="ISR Logo" style="height: 40px; margin-right: 15px;">
+            <span class="text-white fw-bold fs-4">ISR Login System</span>
         </div>
     </header>
 
-    <main class="container my-auto">
+    <main class="container my-auto py-4">
         <div class="login-container animate__animated animate__fadeIn">
             <img src="logoh.png" alt="ISR Logo" class="d-block mx-auto mb-4" style="height: 60px;">
             
-            <!-- Main Login Section -->
-            <div class="form-section active" id="mainSection">
-                <h3 class="form-title">Welcome to ISR</h3>
-                <p class="text-center text-muted mb-4">Sign in to access your products</p>
+            <div id="mainSection">
+                <h3 class="form-title">Selamat Datang</h3>
+                <p class="text-center text-muted mb-4">Silakan login menggunakan akun Google Anda</p>
                 
                 <!-- Google Sign In Button -->
-                <button id="googleSignInBtn" class="btn btn-outline-dark w-100 mb-4">
-                    <img src="https://www.google.com/favicon.ico" alt="Google" style="width: 18px; margin-right: 10px;">
-                    Continue with Google
+                <button id="googleSignInBtn" class="btn btn-outline-dark w-100 mb-3 py-2">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" style="width: 20px; margin-right: 10px;">
+                    Lanjutkan dengan Google
                 </button>
                 
-                <div class="divider mb-4">or</div>
+                <div class="divider">atau</div>
                 
-                <!-- Email Input (initially hidden) -->
+                <!-- Email Section -->
                 <div id="emailSection" style="display: none;">
                     <div class="mb-3">
-                        <input type="email" class="form-control" id="email" placeholder="your@email.com" readonly>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control py-2" id="email" placeholder="email@domain.com" readonly>
                     </div>
                     
-                    <!-- Product Dropdown (initially hidden) -->
+                    <!-- Product Dropdown -->
                     <div id="productDropdownSection" style="display: none;">
                         <div class="mb-3">
-                            <select class="form-select" id="product">
-                                <option selected disabled>Select a product</option>
+                            <label for="product" class="form-label">Pilih Produk</label>
+                            <select class="form-select py-2" id="product">
+                                <option selected disabled>-- Pilih Produk --</option>
                             </select>
+                            <div class="error-message" id="productError"></div>
                         </div>
+                        
+                        <button class="btn btn-primary w-100 py-2" id="verifyBtn">
+                            <span id="verifyBtnText">Verifikasi</span>
+                            <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                        </button>
                     </div>
-                    
-                    <!-- Verify Button (initially hidden) -->
-                    <button class="btn btn-primary w-100 mb-3" id="verifyBtn" style="display: none;">
-                        <span id="verifyBtnText">Verify</span>
-                        <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                    </button>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Access Code Modal -->
-    <div class="modal fade" id="accessCodeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="accessCodeModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="productTitleModal"></h5>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="productTitleModal"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <p>Your access code:</p>
-                    <div class="access-code-display" id="accessCodeDisplay"></div>
-                    <p class="text-muted small">This code will expire in 5 minutes</p>
+                <div class="modal-body text-center pt-0">
+                    <p>Gunakan kode berikut untuk mengakses:</p>
+                    <div class="access-code-display animate__animated animate__pulse" id="accessCodeDisplay"></div>
+                    <div class="mt-3">
+                        <span class="badge countdown-badge bg-warning text-dark" id="countdown">05:00</span>
+                    </div>
+                    <p class="text-muted small mt-2">Kode akan kadaluarsa dalam <span id="expiryText">5 menit</span></p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="loginBtn">Login</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="loginBtn">
+                        <span id="loginBtnText">Masuk</span>
+                        <span class="spinner-border spinner-border-sm d-none" id="loginSpinner"></span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -204,11 +214,10 @@
 
     <footer class="bg-dark text-white py-3 mt-auto">
         <div class="container text-center">
-            <p class="mb-1">&copy; 2025 ISR Project. All rights reserved.</p>
+            <p class="mb-0">&copy; 2025 ISR Project. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Firebase & Libraries -->
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -237,127 +246,211 @@
             const emailSection = document.getElementById('emailSection');
             const productDropdownSection = document.getElementById('productDropdownSection');
             const verifyBtn = document.getElementById('verifyBtn');
-            
             const emailInput = document.getElementById('email');
             const productSelect = document.getElementById('product');
             const googleSignInBtn = document.getElementById('googleSignInBtn');
+            const productError = document.getElementById('productError');
             
             // Modal Elements
             const accessCodeModal = new bootstrap.Modal(document.getElementById('accessCodeModal'));
             const productTitleModal = document.getElementById('productTitleModal');
             const accessCodeDisplay = document.getElementById('accessCodeDisplay');
+            const countdownEl = document.getElementById('countdown');
             const loginBtn = document.getElementById('loginBtn');
             
             let currentEmail = "";
             let currentProduct = "";
             let redirectUrl = "";
+            let countdownInterval;
 
-            // Google Sign-In with Redirect
+            // Google Sign-In
             googleSignInBtn.addEventListener('click', () => {
-                googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Signing in...';
+                googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
                 googleSignInBtn.disabled = true;
                 
                 auth.signInWithRedirect(provider).catch(error => {
-                    console.error("Redirect error:", error);
-                    googleSignInBtn.innerHTML = '<img src="https://www.google.com/favicon.ico" style="width: 18px; margin-right: 10px;"> Continue with Google';
-                    googleSignInBtn.disabled = false;
-                    alert('Sign-in error: ' + error.message);
+                    console.error("Google Sign-In Error:", error);
+                    resetGoogleButton();
+                    showError('Error login Google: ' + error.message);
                 });
             });
 
             // Handle redirect result
             auth.getRedirectResult().then((result) => {
                 if (result.user) {
-                    // Show email in input
-                    currentEmail = result.user.email;
-                    emailInput.value = currentEmail;
-                    emailSection.style.display = 'block';
-                    
-                    // Load products
-                    loadProducts(currentEmail);
-                    
-                    // Show verify button
-                    verifyBtn.style.display = 'block';
+                    handleSuccessfulLogin(result.user);
                 }
             }).catch((error) => {
-                console.error("Redirect result error:", error);
-                alert('Sign-in error: ' + error.message);
+                console.error("Redirect Error:", error);
+                resetGoogleButton();
+                showError('Error autentikasi: ' + error.message);
             });
+
+            function handleSuccessfulLogin(user) {
+                currentEmail = user.email;
+                emailInput.value = currentEmail;
+                emailSection.style.display = 'block';
+                loadProducts(currentEmail);
+                resetGoogleButton();
+            }
+
+            function resetGoogleButton() {
+                googleSignInBtn.innerHTML = 
+                    '<img src="https://www.google.com/favicon.ico" style="width: 20px; margin-right: 10px;"> Lanjutkan dengan Google';
+                googleSignInBtn.disabled = false;
+            }
 
             // Load products for email
             async function loadProducts(email) {
-                verifyBtn.disabled = true;
-                verifyBtnText.textContent = 'Loading...';
-                verifyBtnSpinner.classList.remove('d-none');
+                showLoading(verifyBtn);
                 
                 try {
                     const response = await fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`);
                     const data = await response.json();
 
-                    if (data.success && data.products.length > 0) {
-                        // Populate products
-                        productSelect.innerHTML = '<option selected disabled>Select a product</option>';
-                        data.products.forEach(product => {
-                            const option = document.createElement('option');
-                            option.value = product;
-                            option.textContent = product;
-                            productSelect.appendChild(option);
-                        });
-                        
-                        // Show product dropdown
+                    if (data.success) {
+                        populateProducts(data.products);
                         productDropdownSection.style.display = 'block';
-                        verifyBtnText.textContent = 'Verify';
                     } else {
-                        throw new Error('No products found for this email');
+                        throw new Error(data.message || "Email tidak terdaftar");
                     }
                 } catch (error) {
-                    console.error('Product loading error:', error);
-                    alert('Error: ' + error.message);
+                    console.error('Load Products Error:', error);
+                    showError(error.message, productError);
                 } finally {
-                    verifyBtnSpinner.classList.add('d-none');
-                    verifyBtn.disabled = false;
+                    hideLoading(verifyBtn, 'Verifikasi');
                 }
+            }
+
+            function populateProducts(products) {
+                productSelect.innerHTML = '<option selected disabled>-- Pilih Produk --</option>';
+                
+                if (products.length === 0) {
+                    const option = document.createElement('option');
+                    option.textContent = "Tidak ada produk tersedia";
+                    option.disabled = true;
+                    productSelect.appendChild(option);
+                    return;
+                }
+                
+                products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product;
+                    option.textContent = product;
+                    productSelect.appendChild(option);
+                });
             }
 
             // Verify product selection
             verifyBtn.addEventListener('click', async function() {
-                if (!productSelect.value) {
-                    alert('Please select a product first');
+                if (!productSelect.value || productSelect.disabled) {
+                    showError("Silakan pilih produk", productError);
                     return;
                 }
                 
                 currentProduct = productSelect.value;
-                verifyBtn.disabled = true;
-                verifyBtnText.textContent = 'Getting access...';
-                verifyBtnSpinner.classList.remove('d-none');
+                showLoading(verifyBtn);
                 
                 try {
-                    const response = await fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(currentProduct)}`);
+                    const response = await fetch(
+                        `${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(currentProduct)}`
+                    );
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Show access code in modal
-                        productTitleModal.textContent = currentProduct;
-                        accessCodeDisplay.textContent = data.accessCode;
-                        redirectUrl = data.redirectUrl;
-                        accessCodeModal.show();
+                        showAccessCodeModal(data);
                     } else {
-                        throw new Error(data.message || 'Failed to get access code');
+                        throw new Error(data.message || "Gagal mendapatkan kode akses");
                     }
                 } catch (error) {
-                    console.error('Access code error:', error);
-                    alert('Error: ' + error.message);
+                    console.error('Access Code Error:', error);
+                    showError(error.message, productError);
                 } finally {
-                    verifyBtn.disabled = false;
-                    verifyBtnText.textContent = 'Verify';
-                    verifyBtnSpinner.classList.add('d-none');
+                    hideLoading(verifyBtn, 'Verifikasi');
                 }
             });
             
+            // Show access code modal
+            function showAccessCodeModal(data) {
+                productTitleModal.textContent = currentProduct;
+                accessCodeDisplay.textContent = data.accessCode;
+                redirectUrl = data.redirectUrl || "https://default.isrproject.com";
+                
+                // Start countdown
+                startCountdown(data.expiresIn || 300);
+                
+                // Show modal
+                accessCodeModal.show();
+            }
+            
+            // Countdown timer
+            function startCountdown(duration = 300) {
+                clearInterval(countdownInterval);
+                let timer = duration;
+                
+                updateCountdownDisplay(timer);
+                
+                countdownInterval = setInterval(() => {
+                    timer--;
+                    updateCountdownDisplay(timer);
+                    
+                    if (timer <= 0) {
+                        clearInterval(countdownInterval);
+                        loginBtn.disabled = true;
+                        countdownEl.className = 'badge countdown-badge bg-danger';
+                        countdownEl.textContent = 'KADALUARSA';
+                    }
+                }, 1000);
+            }
+            
+            function updateCountdownDisplay(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                countdownEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
             // Login button in modal
             loginBtn.addEventListener('click', function() {
-                accessCodeModal.hide();
-                window.location.href = redirectUrl;
+                showLoading(loginBtn);
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1000);
+            });
+            
+            // Helper functions
+            function showLoading(button) {
+                const spinner = button.querySelector('.spinner-border');
+                const text = button.querySelector('span:not(.spinner-border)');
+                if (spinner) spinner.classList.remove('d-none');
+                if (text) text.classList.add('d-none');
+                button.disabled = true;
+            }
+            
+            function hideLoading(button, text) {
+                const spinner = button.querySelector('.spinner-border');
+                const textSpan = button.querySelector('span:not(.spinner-border)');
+                if (spinner) spinner.classList.add('d-none');
+                if (textSpan) {
+                    textSpan.classList.remove('d-none');
+                    textSpan.textContent = text;
+                }
+                button.disabled = false;
+            }
+            
+            function showError(message, element) {
+                if (element) {
+                    element.textContent = message;
+                    element.style.display = 'block';
+                    element.classList.add('animate__animated', 'animate__headShake');
+                    setTimeout(() => element.classList.remove('animate__headShake'), 1000);
+                } else {
+                    alert(message);
+                }
+            }
+            
+            // Clear error on select change
+            productSelect.addEventListener('change', () => {
+                productError.style.display = 'none';
             });
         });
     </script>
