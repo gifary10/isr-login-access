@@ -115,6 +115,16 @@
             display: none;
         }
         
+        .user-email-display {
+            font-weight: 500;
+            color: var(--secondary);
+            background: #f0f8ff;
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -156,13 +166,13 @@
                     Lanjutkan dengan Google
                 </button>
                 
-                <div class="divider">atau</div>
+                <div class="divider" id="dividerElement">atau</div>
                 
                 <!-- Email Section -->
                 <div id="emailSection" style="display: none;">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control py-2" id="email" placeholder="email@domain.com" readonly>
+                    <div class="user-email-display">
+                        <i class="fas fa-user-circle me-2"></i>
+                        <span id="emailDisplay"></span>
                     </div>
                     
                     <!-- Product Dropdown -->
@@ -246,9 +256,10 @@
             const emailSection = document.getElementById('emailSection');
             const productDropdownSection = document.getElementById('productDropdownSection');
             const verifyBtn = document.getElementById('verifyBtn');
-            const emailInput = document.getElementById('email');
+            const emailDisplay = document.getElementById('emailDisplay');
             const productSelect = document.getElementById('product');
             const googleSignInBtn = document.getElementById('googleSignInBtn');
+            const dividerElement = document.getElementById('dividerElement');
             const productError = document.getElementById('productError');
             
             // Modal Elements
@@ -263,6 +274,13 @@
             let redirectUrl = "";
             let countdownInterval;
 
+            // Auth State Listener untuk menangani session yang sudah ada
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    handleSuccessfulLogin(user);
+                }
+            });
+
             // Google Sign-In
             googleSignInBtn.addEventListener('click', () => {
                 googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
@@ -275,7 +293,7 @@
                 });
             });
 
-            // Handle redirect result
+            // Handle redirect result setelah kembali dari login Google
             auth.getRedirectResult().then((result) => {
                 if (result.user) {
                     handleSuccessfulLogin(result.user);
@@ -288,10 +306,11 @@
 
             function handleSuccessfulLogin(user) {
                 currentEmail = user.email;
-                emailInput.value = currentEmail;
+                emailDisplay.textContent = currentEmail;
                 emailSection.style.display = 'block';
+                googleSignInBtn.style.display = 'none';
+                dividerElement.style.display = 'none';
                 loadProducts(currentEmail);
-                resetGoogleButton();
             }
 
             function resetGoogleButton() {
@@ -330,6 +349,7 @@
                     option.textContent = "Tidak ada produk tersedia";
                     option.disabled = true;
                     productSelect.appendChild(option);
+                    verifyBtn.disabled = true;
                     return;
                 }
                 
