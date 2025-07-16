@@ -323,9 +323,7 @@
         <div class="container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
                 <div style="background: white; padding: 5px; border-radius: 8px; margin-right: 15px;">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM16 15H8C7.45 15 7 14.55 7 14C7 13.45 7.45 13 8 13H16C16.55 13 17 13.45 17 14C17 14.55 16.55 15 16 15ZM16 11H8C7.45 11 7 10.55 7 10C7 9.45 7.45 9 8 9H16C16.55 9 17 9.45 17 10C17 10.55 16.55 11 16 11ZM12 7H8C7.45 7 7 6.55 7 6C7 5.45 7.45 5 8 5H12C12.55 5 13 5.45 13 6C13 6.55 12.55 7 12 7Z" fill="#004E89"/>
-                    </svg>
+                    <img src="logoh.png" alt="ISR Logo" width="30" height="30">
                 </div>
                 <span class="text-white fw-bold fs-4">ISR Login System</span>
             </div>
@@ -345,9 +343,7 @@
         <div class="login-container animate__animated animate__fadeIn">
             <div class="text-center mb-4">
                 <div style="background: #f0f8ff; width: 80px; height: 80px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM16 15H8C7.45 15 7 14.55 7 14C7 13.45 7.45 13 8 13H16C16.55 13 17 13.45 17 14C17 14.55 16.55 15 16 15ZM16 11H8C7.45 11 7 10.55 7 10C7 9.45 7.45 9 8 9H16C16.55 9 17 9.45 17 10C17 10.55 16.55 11 16 11ZM12 7H8C7.45 7 7 6.55 7 6C7 5.45 7.45 5 8 5H12C12.55 5 13 5.45 13 6C13 6.55 12.55 7 12 7Z" fill="#004E89"/>
-                    </svg>
+                    <img src="logoh.png" alt="ISR Logo" width="40" height="40">
                 </div>
             </div>
             
@@ -395,16 +391,13 @@
         </div>
     </main>
 
-    <!-- Access Code Modal -->
+    <!-- Access Code Modal - Simplified Version -->
     <div class="modal fade" id="accessCodeModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="productTitleModal"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center pt-0">
-                    <p>Gunakan kode berikut untuk mengakses:</p>
+                <div class="modal-body text-center py-4">
+                    <h5 class="mb-3 fw-bold" id="productTitleModal"></h5>
+                    <p class="mb-3">Kode Akses:</p>
                     <div class="access-code-display animate__animated animate__pulse" id="accessCodeDisplay">
                         <button class="copy-btn" id="copyAccessCodeBtn" title="Salin kode">
                             <i class="fas fa-copy"></i>
@@ -415,13 +408,13 @@
                     </div>
                     <p class="text-muted small mt-2">Kode akan kadaluarsa dalam <span id="expiryText">5 menit</span></p>
                     <div class="success-message" id="copySuccessMsg">Kode berhasil disalin!</div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary" id="loginBtn">
-                        <span id="loginBtnText">Masuk</span>
-                        <span class="spinner-border spinner-border-sm d-none" id="loginSpinner"></span>
-                    </button>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" id="loginBtn">
+                            <span id="loginBtnText">Masuk ke Sistem</span>
+                            <span class="spinner-border spinner-border-sm d-none" id="loginSpinner"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
