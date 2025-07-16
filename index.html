@@ -618,6 +618,8 @@
             // Login button in modal
             loginBtn.addEventListener('click', function() {
                 showLoading(loginBtn);
+                // Set login flag in localStorage before redirecting
+                localStorage.setItem('isLoggedIn', 'true');
                 setTimeout(() => {
                     window.location.href = redirectUrl;
                 }, 1000);
