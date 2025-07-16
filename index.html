@@ -106,6 +106,29 @@
                 margin: 0 1rem;
             }
         }
+
+        /* Modal Styling */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .modal-header {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .access-code-display {
+            font-size: 2rem;
+            letter-spacing: 0.5rem;
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -120,74 +143,64 @@
         <div class="login-container animate__animated animate__fadeIn">
             <img src="logoh.png" alt="ISR Logo" class="d-block mx-auto mb-4" style="height: 60px;">
             
-            <!-- Email Section -->
-            <div class="form-section active" id="emailSection">
+            <!-- Main Login Section -->
+            <div class="form-section active" id="mainSection">
                 <h3 class="form-title">Welcome to ISR</h3>
-                <p class="text-center text-muted mb-4">Lakukan Login Melalui Google</p>
+                <p class="text-center text-muted mb-4">Sign in to access your products</p>
                 
-                <div class="mb-3">
-                    <input type="email" class="form-control" id="email" placeholder="your@email.com">
-                    <div class="invalid-feedback">Please enter a valid email address</div>
-                </div>
-                
-                <button class="btn btn-primary w-100 mb-3" id="verifyBtn">
-                    <span id="verifyBtnText">Continue</span>
-                    <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                </button>
-                
-                <div class="divider">or</div>
-                
-                <button id="googleSignInBtn" class="btn btn-outline-dark w-100">
+                <!-- Google Sign In Button -->
+                <button id="googleSignInBtn" class="btn btn-outline-dark w-100 mb-4">
                     <img src="https://www.google.com/favicon.ico" alt="Google" style="width: 18px; margin-right: 10px;">
                     Continue with Google
                 </button>
-            </div>
-            
-            <!-- Product Section -->
-            <div class="form-section" id="productSection">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span id="userEmail" class="text-primary fw-bold"></span>
-                    <span class="verified-badge"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                
+                <div class="divider mb-4">or</div>
+                
+                <!-- Email Input (initially hidden) -->
+                <div id="emailSection" style="display: none;">
+                    <div class="mb-3">
+                        <input type="email" class="form-control" id="email" placeholder="your@email.com" readonly>
+                    </div>
+                    
+                    <!-- Product Dropdown (initially hidden) -->
+                    <div id="productDropdownSection" style="display: none;">
+                        <div class="mb-3">
+                            <select class="form-select" id="product">
+                                <option selected disabled>Select a product</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Verify Button (initially hidden) -->
+                    <button class="btn btn-primary w-100 mb-3" id="verifyBtn" style="display: none;">
+                        <span id="verifyBtnText">Verify</span>
+                        <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
                 </div>
-                
-                <h3 class="form-title">Select Your Product</h3>
-                <p class="text-center text-muted mb-4">Choose the product you want to access</p>
-                
-                <div class="mb-4">
-                    <select class="form-select" id="product">
-                        <option selected disabled>Select a product</option>
-                    </select>
-                </div>
-                
-                <button class="btn btn-outline-secondary w-100" id="backBtn1">
-                    <i class="fas fa-arrow-left me-2"></i>Back
-                </button>
-            </div>
-            
-            <!-- Access Code Section -->
-            <div class="form-section" id="accessCodeSection">
-                <h3 class="form-title" id="productTitle"></h3>
-                <p class="text-center text-muted mb-4">Enter your 6-digit access code</p>
-                
-                <div class="mb-4">
-                    <input type="text" class="form-control text-center" id="accessCode" placeholder="••••••" maxlength="6" style="letter-spacing: 5px; font-size: 1.2rem;">
-                    <div class="invalid-feedback">Please enter a valid access code</div>
-                </div>
-                
-                <button class="btn btn-primary w-100 mb-3" id="submitCode">Submit</button>
-                
-                <button class="btn btn-outline-secondary w-100" id="backBtn2">
-                    <i class="fas fa-arrow-left me-2"></i>Back
-                </button>
-            </div>
-            
-            <!-- Loading Spinner -->
-            <div class="text-center py-4" id="loadingSpinner" style="display: none;">
-                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-                <p class="mt-3 text-primary">Preparing your access...</p>
             </div>
         </div>
     </main>
+
+    <!-- Access Code Modal -->
+    <div class="modal fade" id="accessCodeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productTitleModal"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Your access code:</p>
+                    <div class="access-code-display" id="accessCodeDisplay"></div>
+                    <p class="text-muted small">This code will expire in 5 minutes</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="loginBtn">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-dark text-white py-3 mt-auto">
         <div class="container text-center">
@@ -222,78 +235,26 @@
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
             const emailSection = document.getElementById('emailSection');
-            const productSection = document.getElementById('productSection');
-            const accessCodeSection = document.getElementById('accessCodeSection');
-            const loadingSpinner = document.getElementById('loadingSpinner');
+            const productDropdownSection = document.getElementById('productDropdownSection');
+            const verifyBtn = document.getElementById('verifyBtn');
             
             const emailInput = document.getElementById('email');
-            const verifyBtn = document.getElementById('verifyBtn');
-            const verifyBtnText = document.getElementById('verifyBtnText');
-            const verifyBtnSpinner = document.getElementById('verifyBtnSpinner');
-            
-            const googleSignInBtn = document.getElementById('googleSignInBtn');
             const productSelect = document.getElementById('product');
-            const backBtn1 = document.getElementById('backBtn1');
-            const backBtn2 = document.getElementById('backBtn2');
-            const submitCode = document.getElementById('submitCode');
+            const googleSignInBtn = document.getElementById('googleSignInBtn');
+            
+            // Modal Elements
+            const accessCodeModal = new bootstrap.Modal(document.getElementById('accessCodeModal'));
+            const productTitleModal = document.getElementById('productTitleModal');
+            const accessCodeDisplay = document.getElementById('accessCodeDisplay');
+            const loginBtn = document.getElementById('loginBtn');
             
             let currentEmail = "";
-            let expectedAccessCode = "";
+            let currentProduct = "";
             let redirectUrl = "";
-
-            // Show section function
-            function showSection(section) {
-                document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
-                loadingSpinner.style.display = 'none';
-                section.classList.add('active');
-            }
-
-            // Email verification
-            async function verifyEmail(email) {
-                if (!email.includes('@')) {
-                    emailInput.classList.add('is-invalid');
-                    return;
-                }
-
-                verifyBtnText.textContent = 'Verifying...';
-                verifyBtnSpinner.classList.remove('d-none');
-                verifyBtn.disabled = true;
-
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`);
-                    const data = await response.json();
-
-                    if (data.success) {
-                        currentEmail = email;
-                        document.getElementById('userEmail').textContent = email;
-                        
-                        // Populate products
-                        productSelect.innerHTML = '<option selected disabled>Select a product</option>';
-                        data.products.forEach(product => {
-                            const option = document.createElement('option');
-                            option.value = product;
-                            option.textContent = product;
-                            productSelect.appendChild(option);
-                        });
-                        
-                        showSection(productSection);
-                    } else {
-                        emailInput.classList.add('is-invalid');
-                        throw new Error('Email not found');
-                    }
-                } catch (error) {
-                    console.error('Verification error:', error);
-                    alert('Error verifying email: ' + error.message);
-                } finally {
-                    verifyBtnText.textContent = 'Continue';
-                    verifyBtnSpinner.classList.add('d-none');
-                    verifyBtn.disabled = false;
-                }
-            }
 
             // Google Sign-In with Redirect
             googleSignInBtn.addEventListener('click', () => {
-                googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Redirecting...';
+                googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Signing in...';
                 googleSignInBtn.disabled = true;
                 
                 auth.signInWithRedirect(provider).catch(error => {
@@ -307,60 +268,96 @@
             // Handle redirect result
             auth.getRedirectResult().then((result) => {
                 if (result.user) {
-                    emailInput.value = result.user.email;
-                    verifyEmail(result.user.email);
+                    // Show email in input
+                    currentEmail = result.user.email;
+                    emailInput.value = currentEmail;
+                    emailSection.style.display = 'block';
+                    
+                    // Load products
+                    loadProducts(currentEmail);
+                    
+                    // Show verify button
+                    verifyBtn.style.display = 'block';
                 }
             }).catch((error) => {
                 console.error("Redirect result error:", error);
                 alert('Sign-in error: ' + error.message);
             });
 
-            // Event Listeners
-            verifyBtn.addEventListener('click', () => verifyEmail(emailInput.value));
-            
-            backBtn1.addEventListener('click', () => showSection(emailSection));
-            backBtn2.addEventListener('click', () => showSection(productSection));
-            
-            productSelect.addEventListener('change', async function() {
-                if (this.value) {
-                    document.getElementById('productTitle').textContent = this.value;
-                    
-                    try {
-                        const response = await fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(this.value)}`);
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            expectedAccessCode = data.accessCode;
-                            redirectUrl = data.redirectUrl;
-                            showSection(accessCodeSection);
-                        } else {
-                            throw new Error('Failed to get access code');
-                        }
-                    } catch (error) {
-                        console.error('Product error:', error);
-                        alert('Error: ' + error.message);
-                        this.value = '';
-                    }
-                }
-            });
-            
-            submitCode.addEventListener('click', function() {
-                const accessCode = document.getElementById('accessCode').value;
+            // Load products for email
+            async function loadProducts(email) {
+                verifyBtn.disabled = true;
+                verifyBtnText.textContent = 'Loading...';
+                verifyBtnSpinner.classList.remove('d-none');
                 
-                if (accessCode !== expectedAccessCode) {
-                    document.getElementById('accessCode').classList.add('is-invalid', 'shake');
-                    setTimeout(() => document.getElementById('accessCode').classList.remove('shake'), 500);
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`);
+                    const data = await response.json();
+
+                    if (data.success && data.products.length > 0) {
+                        // Populate products
+                        productSelect.innerHTML = '<option selected disabled>Select a product</option>';
+                        data.products.forEach(product => {
+                            const option = document.createElement('option');
+                            option.value = product;
+                            option.textContent = product;
+                            productSelect.appendChild(option);
+                        });
+                        
+                        // Show product dropdown
+                        productDropdownSection.style.display = 'block';
+                        verifyBtnText.textContent = 'Verify';
+                    } else {
+                        throw new Error('No products found for this email');
+                    }
+                } catch (error) {
+                    console.error('Product loading error:', error);
+                    alert('Error: ' + error.message);
+                } finally {
+                    verifyBtnSpinner.classList.add('d-none');
+                    verifyBtn.disabled = false;
+                }
+            }
+
+            // Verify product selection
+            verifyBtn.addEventListener('click', async function() {
+                if (!productSelect.value) {
+                    alert('Please select a product first');
                     return;
                 }
                 
-                showSection(loadingSpinner);
-                setTimeout(() => window.location.href = redirectUrl, 2000);
+                currentProduct = productSelect.value;
+                verifyBtn.disabled = true;
+                verifyBtnText.textContent = 'Getting access...';
+                verifyBtnSpinner.classList.remove('d-none');
+                
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(currentProduct)}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Show access code in modal
+                        productTitleModal.textContent = currentProduct;
+                        accessCodeDisplay.textContent = data.accessCode;
+                        redirectUrl = data.redirectUrl;
+                        accessCodeModal.show();
+                    } else {
+                        throw new Error(data.message || 'Failed to get access code');
+                    }
+                } catch (error) {
+                    console.error('Access code error:', error);
+                    alert('Error: ' + error.message);
+                } finally {
+                    verifyBtn.disabled = false;
+                    verifyBtnText.textContent = 'Verify';
+                    verifyBtnSpinner.classList.add('d-none');
+                }
             });
             
-            // Clear validation on input
-            emailInput.addEventListener('input', () => emailInput.classList.remove('is-invalid'));
-            document.getElementById('accessCode').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
+            // Login button in modal
+            loginBtn.addEventListener('click', function() {
+                accessCodeModal.hide();
+                window.location.href = redirectUrl;
             });
         });
     </script>
