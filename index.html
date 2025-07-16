@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* CSS tetap dipertahankan sama seperti sebelumnya */
         :root {
             --primary: #FF6B35;
             --secondary: #004E89;
@@ -156,23 +157,6 @@
             justify-content: center;
         }
         
-        #logoutBtn {
-            transition: all 0.3s ease;
-        }
-        
-        #logoutBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .fa-sign-out-alt {
-            transition: transform 0.3s ease;
-        }
-        
-        #logoutBtn:hover .fa-sign-out-alt {
-            transform: translateX(2px);
-        }
-        
         .status-indicator {
             height: 10px;
             width: 10px;
@@ -224,11 +208,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         
         .toast-container {
@@ -297,16 +276,6 @@
                 letter-spacing: 0.3rem;
                 padding: 1rem;
             }
-            
-            header .container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            #logoutBtn {
-                margin-top: 10px;
-                align-self: flex-end;
-            }
         }
     </style>
 </head>
@@ -329,12 +298,9 @@
             </div>
             <div class="d-flex align-items-center">
                 <div class="d-flex align-items-center me-3">
-                    <span class="status-indicator status-connected" id="firebaseStatus"></span>
-                    <span class="text-white small">Firebase</span>
+                    <span class="status-indicator status-connected" id="apiStatus"></span>
+                    <span class="text-white small">API Connected</span>
                 </div>
-                <button id="logoutBtn" class="btn btn-sm btn-light d-none">
-                    <i class="fas fa-sign-out-alt me-1"></i> Logout
-                </button>
             </div>
         </div>
     </header>
@@ -349,44 +315,44 @@
             
             <div id="mainSection">
                 <h3 class="form-title">Selamat Datang</h3>
-                <p class="text-center text-muted mb-4">Silakan login menggunakan akun Google Anda</p>
+                <p class="text-center text-muted mb-4">Silakan masukkan email Anda yang terdaftar</p>
                 
-                <!-- Google Sign In Button -->
-                <button id="googleSignInBtn" class="btn btn-outline-dark w-100 mb-3 py-2">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 20px; margin-right: 10px;">
-                    Lanjutkan dengan Google
+                <!-- Email Input Form -->
+                <div class="mb-3">
+                    <input type="email" class="form-control py-2" id="emailInput" placeholder="Email Anda">
+                    <div class="error-message" id="emailError"></div>
+                </div>
+                
+                <button class="btn btn-primary w-100 py-2" id="submitEmailBtn">
+                    <span id="submitEmailBtnText">Lanjutkan</span>
+                    <span id="submitEmailBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
                 </button>
                 
-                <div class="divider" id="dividerElement">atau</div>
-                
-                <!-- Email Section -->
-                <div id="emailSection" style="display: none;">
-                    <div class="user-email-display">
+                <!-- Product Dropdown (akan ditampilkan setelah email divalidasi) -->
+                <div id="productDropdownSection" style="display: none;">
+                    <div class="user-email-display mt-4">
                         <i class="fas fa-user-circle me-2"></i>
                         <span id="emailDisplay"></span>
                     </div>
                     
-                    <!-- Product Dropdown -->
-                    <div id="productDropdownSection" style="display: none;">
-                        <div class="mb-3">
-                            <label for="product" class="form-label">Pilih Produk</label>
-                            <select class="form-select py-2" id="product">
-                                <option selected disabled>-- Pilih Produk --</option>
-                            </select>
-                            <div class="error-message" id="productError"></div>
-                        </div>
-                        
-                        <button class="btn btn-primary w-100 py-2" id="verifyBtn">
-                            <span id="verifyBtnText">Verifikasi</span>
-                            <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                        </button>
+                    <div class="mb-3 mt-3">
+                        <label for="product" class="form-label">Pilih Produk</label>
+                        <select class="form-select py-2" id="product">
+                            <option selected disabled>-- Pilih Produk --</option>
+                        </select>
+                        <div class="error-message" id="productError"></div>
                     </div>
+                    
+                    <button class="btn btn-primary w-100 py-2" id="verifyBtn">
+                        <span id="verifyBtnText">Verifikasi</span>
+                        <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
                 </div>
             </div>
             
             <div class="security-badge">
                 <i class="fas fa-shield-alt me-2"></i>
-                Sistem ini menggunakan autentikasi 2 langkah untuk keamanan data Anda
+                Sistem ini menggunakan verifikasi email untuk keamanan data Anda
             </div>
         </div>
     </main>
@@ -427,42 +393,23 @@
         </div>
     </footer>
 
-    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyBp1bZZk7S11oIo6jBQKj1jjP78OXgqPa4",
-            authDomain: "isr-project-3dc62.firebaseapp.com",
-            projectId: "isr-project-3dc62",
-            storageBucket: "isr-project-3dc62.appspot.com",
-            messagingSenderId: "549792110057",
-            appId: "1:549792110057:web:b8e36a02549cd48753e778"
-        };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const provider = new firebase.auth.GoogleAuthProvider();
-        
         // Google Sheets API
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOJmtJClRaFKpThGB0ltnl-1w2ytoFQZKVXwRWtPgVvMKr9wf4Ti0nwNu2sfARSjnnCA/exec";
         
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
-            const emailSection = document.getElementById('emailSection');
+            const emailInput = document.getElementById('emailInput');
+            const emailError = document.getElementById('emailError');
+            const submitEmailBtn = document.getElementById('submitEmailBtn');
             const productDropdownSection = document.getElementById('productDropdownSection');
             const verifyBtn = document.getElementById('verifyBtn');
             const emailDisplay = document.getElementById('emailDisplay');
             const productSelect = document.getElementById('product');
-            const googleSignInBtn = document.getElementById('googleSignInBtn');
-            const dividerElement = document.getElementById('dividerElement');
             const productError = document.getElementById('productError');
-            const logoutBtn = document.getElementById('logoutBtn');
             const globalLoading = document.getElementById('globalLoading');
-            const firebaseStatus = document.getElementById('firebaseStatus');
             const copyAccessCodeBtn = document.getElementById('copyAccessCodeBtn');
             const copySuccessMsg = document.getElementById('copySuccessMsg');
             
@@ -478,9 +425,6 @@
             let redirectUrl = "";
             let countdownInterval;
 
-            // Tampilkan status Firebase
-            firebaseStatus.classList.add('status-connected');
-            
             // Fungsi untuk menampilkan toast notifikasi
             function showToast(message, type = 'success') {
                 const toastContainer = document.getElementById('toastContainer');
@@ -532,121 +476,53 @@
                 globalLoading.style.display = 'none';
             }
             
-            // Fungsi Logout
-            function handleLogout() {
-                showGlobalLoading();
-                auth.signOut().then(() => {
-                    // Reset semua state
-                    currentEmail = "";
-                    currentProduct = "";
-                    redirectUrl = "";
-                    
-                    // Reset tampilan
-                    emailSection.style.display = 'none';
-                    productDropdownSection.style.display = 'none';
-                    googleSignInBtn.style.display = 'block';
-                    dividerElement.style.display = 'block';
-                    logoutBtn.classList.add('d-none');
-                    
-                    // Reset form
-                    emailDisplay.textContent = '';
-                    productSelect.innerHTML = '<option selected disabled>-- Pilih Produk --</option>';
-                    
-                    // Tutup modal jika terbuka
-                    accessCodeModal.hide();
-                    
-                    // Clear countdown
-                    clearInterval(countdownInterval);
-                    
-                    showToast('Anda berhasil logout', 'success');
-                    
-                }).catch((error) => {
-                    console.error("Logout Error:", error);
-                    showToast('Gagal logout: ' + error.message, 'error');
-                }).finally(() => {
-                    hideGlobalLoading();
-                });
+            // Fungsi validasi email
+            function isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
             }
-
-            // Auth State Listener
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    handleSuccessfulLogin(user);
-                    logoutBtn.classList.remove('d-none');
-                } else {
-                    logoutBtn.classList.add('d-none');
-                }
-            });
-
-            // Event listener untuk tombol logout
-            logoutBtn.addEventListener('click', handleLogout);
-
-            // Google Sign-In
-            googleSignInBtn.addEventListener('click', () => {
-                googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
-                googleSignInBtn.disabled = true;
+            
+            // Submit email
+            submitEmailBtn.addEventListener('click', async function() {
+                const email = emailInput.value.trim();
                 
-                auth.signInWithRedirect(provider).catch(error => {
-                    console.error("Google Sign-In Error:", error);
-                    resetGoogleButton();
-                    showToast('Error login Google: ' + error.message, 'error');
-                });
-            });
-
-            // Handle redirect result setelah kembali dari login Google
-            auth.getRedirectResult().then((result) => {
-                if (result.user) {
-                    handleSuccessfulLogin(result.user);
+                // Validasi email
+                if (!email) {
+                    showError("Email harus diisi", emailError);
+                    return;
                 }
-            }).catch((error) => {
-                console.error("Redirect Error:", error);
-                resetGoogleButton();
-                showToast('Error autentikasi: ' + error.message, 'error');
-            });
-
-            function handleSuccessfulLogin(user) {
-                currentEmail = user.email;
-                emailDisplay.textContent = currentEmail;
-                emailSection.style.display = 'block';
-                googleSignInBtn.style.display = 'none';
-                dividerElement.style.display = 'none';
-                loadProducts(currentEmail);
-                showToast('Login berhasil!', 'success');
-            }
-
-            function resetGoogleButton() {
-                googleSignInBtn.innerHTML = 
-                    '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 20px; margin-right: 10px;"> Lanjutkan dengan Google';
-                googleSignInBtn.disabled = false;
-            }
-
-            // Load products for email
-            async function loadProducts(email) {
-                showGlobalLoading();
+                
+                if (!isValidEmail(email)) {
+                    showError("Format email tidak valid", emailError);
+                    return;
+                }
+                
+                showLoading(submitEmailBtn);
+                currentEmail = email;
                 
                 try {
                     const response = await fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`);
                     const data = await response.json();
 
                     if (data.success) {
+                        // Tampilkan produk yang tersedia
+                        emailDisplay.textContent = email;
                         populateProducts(data.products);
                         productDropdownSection.style.display = 'block';
+                        emailError.style.display = 'none';
+                        showToast('Email terverifikasi', 'success');
                     } else {
                         throw new Error(data.message || "Email tidak terdaftar");
                     }
                 } catch (error) {
-                    console.error('Load Products Error:', error);
-                    showError(error.message, productError);
+                    console.error('Email Verification Error:', error);
+                    showError(error.message, emailError);
                     showToast('Error: ' + error.message, 'error');
-                    // Logout jika email tidak terdaftar
-                    setTimeout(() => {
-                        handleLogout();
-                    }, 3000);
                 } finally {
-                    hideGlobalLoading();
+                    hideLoading(submitEmailBtn, "Lanjutkan");
                 }
-            }
+            });
 
+            // Populate produk dropdown
             function populateProducts(products) {
                 productSelect.innerHTML = '<option selected disabled>-- Pilih Produk --</option>';
                 
@@ -656,7 +532,7 @@
                     option.disabled = true;
                     productSelect.appendChild(option);
                     verifyBtn.disabled = true;
-                    showToast('Tidak ada produk yang tersedia untuk akun ini', 'warning');
+                    showToast('Tidak ada produk yang tersedia untuk email ini', 'warning');
                     return;
                 }
                 
@@ -676,7 +552,7 @@
                 }
                 
                 currentProduct = productSelect.value;
-                showGlobalLoading();
+                showLoading(verifyBtn);
                 
                 try {
                     const response = await fetch(
@@ -694,7 +570,7 @@
                     showError(error.message, productError);
                     showToast('Error: ' + error.message, 'error');
                 } finally {
-                    hideGlobalLoading();
+                    hideLoading(verifyBtn, "Verifikasi");
                 }
             });
             
@@ -800,7 +676,11 @@
                 }
             }
             
-            // Clear error on select change
+            // Clear error on input change
+            emailInput.addEventListener('input', () => {
+                emailError.style.display = 'none';
+            });
+            
             productSelect.addEventListener('change', () => {
                 productError.style.display = 'none';
             });
