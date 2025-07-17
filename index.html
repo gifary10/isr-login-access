@@ -42,6 +42,7 @@
             background-color: #d3eed0;
             border-radius: 10px;
             padding: 1rem;
+            margin-top: 1.5rem;
         }
         
         .login-container::before {
@@ -77,8 +78,8 @@
         }
         
         .access-code-display {
-            font-size: 2.5rem;
-            letter-spacing: 0.5rem;
+            font-size: 1.8rem;
+            letter-spacing: 0.3rem;
             text-align: center;
             padding: 1.5rem;
             background: #f8f9fa;
@@ -88,23 +89,6 @@
             font-family: monospace;
             border: 2px dashed #dee2e6;
             position: relative;
-        }
-        
-        .copy-btn {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background: rgba(255,255,255,0.8);
-            border: none;
-            border-radius: 4px;
-            padding: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .copy-btn:hover {
-            background: var(--light);
-            transform: scale(1.05);
         }
         
         .countdown-badge {
@@ -142,13 +126,6 @@
             display: none;
         }
         
-        .success-message {
-            color: var(--success);
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-        
         .user-email-display {
             font-weight: 500;
             color: var(--secondary);
@@ -160,31 +137,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        
-        .status-indicator {
-            height: 10px;
-            width: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-        
-        .status-connected {
-            background-color: var(--success);
-        }
-        
-        .status-disconnected {
-            background-color: var(--danger);
-        }
-        
-        .security-badge {
-            background-color: rgba(0, 78, 137, 0.1);
-            border-left: 4px solid var(--secondary);
-            padding: 0.75rem;
-            border-radius: 4px;
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
         }
         
         .loading-overlay {
@@ -247,80 +199,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
-        .toast-icon {
-            font-size: 1.5rem;
-            margin-right: 15px;
-        }
-        
-        .toast-content {
-            flex: 1;
-        }
-        
-        .toast-close {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            margin-left: 15px;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-        
-        .toast-close:hover {
-            opacity: 1;
-        }
-
-        /* New Alert Style */
-        .access-alert {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-left: 6px solid var(--primary);
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .access-alert-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .access-alert-title {
-            font-weight: 600;
-            color: var(--secondary);
-            margin: 0;
-        }
-
-        .access-alert-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: #6c757d;
-        }
-        
-        @media (max-width: 576px) {
-            .login-container {
-                padding: 2rem 1.5rem;
-                margin: 1rem;
-            }
-            
-            .access-code-display {
-                font-size: 1.8rem;
-                letter-spacing: 0.3rem;
-                padding: 1rem;
-            }
-        }
-
         /* Step indicator */
         .step-indicator {
             display: flex;
@@ -395,6 +273,19 @@
             z-index: 1;
             transition: width 0.3s;
         }
+
+        @media (max-width: 576px) {
+            .login-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+            
+            .access-code-display {
+                font-size: 1.5rem;
+                letter-spacing: 0.2rem;
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -452,7 +343,7 @@
                 <div id="usernameSection">
                     <p class="text-center text-muted mb-4">Masukkan Username Anda</p>
                     <div class="mb-3">
-                        <input type="text" class="form-control py-2" id="usernameInput" placeholder="Masukkan Username">
+                        <input type="text" class="form-control py-2" id="usernameInput" placeholder="Masukkan Username" autocomplete="username">
                         <div class="error-message" id="usernameError"></div>
                     </div>
                     
@@ -466,7 +357,7 @@
                 <div id="emailSection" style="display: none;">
                     <p class="text-center text-muted mb-4">Masukkan Email Saat Pembelian di Lynk.id</p>
                     <div class="mb-3">
-                        <input type="email" class="form-control py-2" id="emailInput" placeholder="Masukkan Email Anda">
+                        <input type="email" class="form-control py-2" id="emailInput" placeholder="Masukkan Email Anda" autocomplete="email">
                         <div class="error-message" id="emailError"></div>
                     </div>
                     
@@ -522,24 +413,31 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="accessCodeInput" class="form-label">Masukkan Kode Akses</label>
-                        <input type="text" class="form-control py-2 text-center" id="accessCodeInput" placeholder="Masukkan 6 digit kode">
-                        <div class="error-message" id="accessCodeError"></div>
+                        <label class="form-label">Kode Akses Anda</label>
+                        <div class="access-code-display" id="accessCodeDisplay">
+                            <span id="generatedAccessCode"></span>
+                        </div>
+                        <div class="text-center">
+                            <span class="badge bg-warning text-dark countdown-badge">
+                                <i class="fas fa-clock me-1"></i>
+                                <span id="countdown">05:00</span>
+                            </span>
+                        </div>
                     </div>
                     
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-outline-secondary me-2" id="backToProductBtn">
                             <i class="fas fa-arrow-left me-1"></i> Kembali
                         </button>
-                        <button class="btn btn-primary flex-grow-1" id="submitAccessCodeBtn">
-                            <span id="submitAccessCodeBtnText">Masuk ke Sistem</span>
-                            <span id="submitAccessCodeBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                        <button class="btn btn-primary flex-grow-1" id="continueBtn">
+                            <span id="continueBtnText">Lanjutkan ke Sistem</span>
+                            <span id="continueBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
                         </button>
                     </div>
                 </div>
             </div>
             
-            <div class="mt-4 info-box">
+            <div class="info-box">
                 <small>
                     Untuk mendapatkan akses ke produk aplikasi. Anda diwajibkan terlebih dahulu melakukan pembelian resmi melalui portal
                     <a href="https://lynk.id/gifary10" target="_blank">lynk.id/gifary10</a>.
@@ -584,9 +482,9 @@
             const usernameDisplayFinal = document.getElementById('usernameDisplayFinal');
             const emailDisplayFinal = document.getElementById('emailDisplayFinal');
             const productDisplay = document.getElementById('productDisplay');
-            const accessCodeInput = document.getElementById('accessCodeInput');
-            const accessCodeError = document.getElementById('accessCodeError');
-            const submitAccessCodeBtn = document.getElementById('submitAccessCodeBtn');
+            const accessCodeDisplay = document.getElementById('generatedAccessCode');
+            const countdownElement = document.getElementById('countdown');
+            const continueBtn = document.getElementById('continueBtn');
             const backToProductBtn = document.getElementById('backToProductBtn');
             
             const globalLoading = document.getElementById('globalLoading');
@@ -606,8 +504,9 @@
             let currentEmail = "";
             let currentProduct = "";
             let currentAccessCode = "";
-            let redirectUrl = "";
+            let redirectUrl = "https://gifary10.github.io/isr-login-access/";
             let countdownInterval;
+            let timeLeft = 300; // 5 minutes in seconds
 
             // Fungsi untuk menampilkan toast notifikasi
             function showToast(message, type = 'success') {
@@ -700,6 +599,31 @@
                 }
             }
             
+            // Format waktu countdown
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // Start countdown timer
+            function startCountdown() {
+                clearInterval(countdownInterval);
+                timeLeft = 300;
+                countdownElement.textContent = formatTime(timeLeft);
+                
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    countdownElement.textContent = formatTime(timeLeft);
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        showToast('Kode akses telah kedaluwarsa', 'warning');
+                        continueBtn.disabled = true;
+                    }
+                }, 1000);
+            }
+            
             // Submit username
             submitUsernameBtn.addEventListener('click', function() {
                 const username = usernameInput.value.trim();
@@ -715,7 +639,7 @@
                     return;
                 }
                 
-                currentUsername = username;
+                currentUsername = username.toLowerCase();
                 
                 // Hide username section, show email section
                 usernameSection.style.display = 'none';
@@ -732,7 +656,7 @@
             
             // Submit email
             submitEmailBtn.addEventListener('click', async function() {
-                const email = emailInput.value.trim();
+                const email = emailInput.value.trim().toLowerCase();
                 
                 // Validasi email
                 if (!email) {
@@ -749,7 +673,7 @@
                 currentEmail = email;
                 
                 try {
-                    const response = await fetch(`${SCRIPT_URL}?action=verifyEmail&email=${encodeURIComponent(email)}`);
+                    const response = await fetch(`${SCRIPT_URL}?action=verifyEmail&user=${encodeURIComponent(currentUsername)}&email=${encodeURIComponent(email)}`);
                     const data = await response.json();
 
                     if (data.success) {
@@ -763,7 +687,7 @@
                         updateStepIndicator(3);
                         showToast('Email terverifikasi', 'success');
                     } else {
-                        throw new Error(data.message || "Email tidak terdaftar");
+                        throw new Error(data.message || "Email tidak terdaftar untuk username ini");
                     }
                 } catch (error) {
                     console.error('Email Verification Error:', error);
@@ -786,19 +710,20 @@
                 accessCodeSection.style.display = 'none';
                 productDropdownSection.style.display = 'block';
                 updateStepIndicator(3);
+                clearInterval(countdownInterval);
             });
 
             // Populate produk dropdown
             function populateProducts(products) {
                 productSelect.innerHTML = '<option selected disabled>-- Pilih Produk --</option>';
                 
-                if (products.length === 0) {
+                if (products && products.length === 0) {
                     const option = document.createElement('option');
                     option.textContent = "Tidak ada produk tersedia";
                     option.disabled = true;
                     productSelect.appendChild(option);
                     verifyBtn.disabled = true;
-                    showToast('Tidak ada produk yang tersedia untuk email ini', 'warning');
+                    showToast('Tidak ada produk yang tersedia untuk kombinasi username dan email ini', 'warning');
                     return;
                 }
                 
@@ -822,24 +747,26 @@
                 
                 try {
                     const response = await fetch(
-                        `${SCRIPT_URL}?action=getAccessCode&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(currentProduct)}`
+                        `${SCRIPT_URL}?action=getAccessCode&user=${encodeURIComponent(currentUsername)}&email=${encodeURIComponent(currentEmail)}&product=${encodeURIComponent(currentProduct)}`
                     );
                     const data = await response.json();
                     
                     if (data.success) {
                         currentAccessCode = data.accessCode;
-                        redirectUrl = data.redirectUrl || "https://default.isrproject.com";
+                        redirectUrl = data.redirectUrl || redirectUrl;
                         
                         // Show access code section
                         usernameDisplayFinal.textContent = currentUsername;
                         emailDisplayFinal.textContent = currentEmail;
                         productDisplay.value = currentProduct;
+                        accessCodeDisplay.textContent = currentAccessCode;
                         
                         productDropdownSection.style.display = 'none';
                         accessCodeSection.style.display = 'block';
                         updateStepIndicator(4);
                         
-                        showToast('Kode akses telah dikirim', 'success');
+                        startCountdown();
+                        showToast('Kode akses berhasil dibuat', 'success');
                     } else {
                         throw new Error(data.message || "Gagal mendapatkan kode akses");
                     }
@@ -852,21 +779,9 @@
                 }
             });
             
-            // Submit access code
-            submitAccessCodeBtn.addEventListener('click', function() {
-                const enteredCode = accessCodeInput.value.trim();
-                
-                if (!enteredCode) {
-                    showError("Masukkan kode akses", accessCodeError);
-                    return;
-                }
-                
-                if (enteredCode !== currentAccessCode) {
-                    showError("Kode akses tidak valid", accessCodeError);
-                    return;
-                }
-                
-                showLoading(submitAccessCodeBtn);
+            // Continue to system
+            continueBtn.addEventListener('click', function() {
+                showLoading(continueBtn);
                 
                 // Set login flag and additional info in localStorage
                 localStorage.setItem('isLoggedIn', 'true');
@@ -921,10 +836,6 @@
             
             productSelect.addEventListener('change', () => {
                 productError.style.display = 'none';
-            });
-            
-            accessCodeInput.addEventListener('input', () => {
-                accessCodeError.style.display = 'none';
             });
         });
     </script>
