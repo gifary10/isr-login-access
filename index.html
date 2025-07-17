@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS tetap dipertahankan sama seperti sebelumnya */
         :root {
             --primary: #fc5619;
             --secondary: #1e1e1f;
@@ -39,11 +38,11 @@
             overflow: hidden;
         }
 
-.info-box {
-      background-color: #d3eed0;
-      border-radius: 10px;
-      padding: 1rem;
-    }
+        .info-box {
+            background-color: #d3eed0;
+            border-radius: 10px;
+            padding: 1rem;
+        }
         
         .login-container::before {
             content: '';
@@ -270,6 +269,44 @@
         .toast-close:hover {
             opacity: 1;
         }
+
+        /* New Alert Style */
+        .access-alert {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 6px solid var(--primary);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .access-alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .access-alert-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin: 0;
+        }
+
+        .access-alert-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
         
         @media (max-width: 576px) {
             .login-container {
@@ -297,7 +334,7 @@
     <header class="bg-light py-1">
         <div class="container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
-                <div">
+                <div>
                     <img src="logoh.png" alt="ISR Logo" width="auto" height="45">
                 </div>
             </div>
@@ -347,24 +384,13 @@
                         <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
                     </button>
                 </div>
-            </div>
-            
-            <div class="mt-4 info-box">
-                <small>
-        Untuk mendapatkan akses ke produk aplikasi. Anda diwajibkan terlebih dahulu melakukan pembelian resmi melalui portal
-        <a href="https://lynk.id/gifary10" target="_blank">lynk.id/gifary10</a>.
-        Hanya pengguna yang terverifikasi sebagai pembeli yang akan diberikan hak akses login ke dalam sistem.
-      </small>
-            </div>
-        </div>
-    </main>
 
-    <!-- Access Code Modal - Simplified Version -->
-    <div class="modal fade" id="accessCodeModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center py-4">
-                    <h5 class="mb-3 fw-bold" id="productTitleModal"></h5>
+                <!-- Access Code Alert (replaces modal) -->
+                <div class="access-alert" id="accessAlert">
+                    <div class="access-alert-header">
+                        <h5 class="access-alert-title" id="productTitleAlert"></h5>
+                        <button class="access-alert-close" id="closeAccessAlert">&times;</button>
+                    </div>
                     <p class="mb-3">Kode Akses:</p>
                     <div class="access-code-display animate__animated animate__pulse" id="accessCodeDisplay">
                         <button class="copy-btn" id="copyAccessCodeBtn" title="Salin kode">
@@ -385,8 +411,16 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="mt-4 info-box">
+                <small>
+                    Untuk mendapatkan akses ke produk aplikasi. Anda diwajibkan terlebih dahulu melakukan pembelian resmi melalui portal
+                    <a href="https://lynk.id/gifary10" target="_blank">lynk.id/gifary10</a>.
+                    Hanya pengguna yang terverifikasi sebagai pembeli yang akan diberikan hak akses login ke dalam sistem.
+                </small>
+            </div>
         </div>
-    </div>
+    </main>
 
     <footer class="bg-dark text-white py-1 mt-auto">
         <div class="container text-center">
@@ -398,7 +432,7 @@
 
     <script>
         // Google Sheets API
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOJmtJClRaFKpThGB0ltnl-1w2ytoFQZKVXwRWtPgVvMKr9wf4Ti0nwNu2sfARSjnnCA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEjl7ig0V9_AzBrgEhxpjL6JQI8-Mmy3tl0GTq0FbJ67Q2PSv5FOn9HMp93j8VpT7YCA/exec";
         
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
@@ -413,10 +447,11 @@
             const globalLoading = document.getElementById('globalLoading');
             const copyAccessCodeBtn = document.getElementById('copyAccessCodeBtn');
             const copySuccessMsg = document.getElementById('copySuccessMsg');
+            const accessAlert = document.getElementById('accessAlert');
+            const closeAccessAlert = document.getElementById('closeAccessAlert');
             
-            // Modal Elements
-            const accessCodeModal = new bootstrap.Modal(document.getElementById('accessCodeModal'));
-            const productTitleModal = document.getElementById('productTitleModal');
+            // Alert Elements
+            const productTitleAlert = document.getElementById('productTitleAlert');
             const accessCodeDisplay = document.getElementById('accessCodeDisplay');
             const countdownEl = document.getElementById('countdown');
             const loginBtn = document.getElementById('loginBtn');
@@ -562,7 +597,7 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        showAccessCodeModal(data);
+                        showAccessAlert(data);
                     } else {
                         throw new Error(data.message || "Gagal mendapatkan kode akses");
                     }
@@ -575,18 +610,25 @@
                 }
             });
             
-            // Show access code modal
-            function showAccessCodeModal(data) {
-                productTitleModal.textContent = currentProduct;
+            // Show access alert (replaces modal)
+            function showAccessAlert(data) {
+                productTitleAlert.textContent = currentProduct;
                 accessCodeDisplay.textContent = data.accessCode;
                 redirectUrl = data.redirectUrl || "https://default.isrproject.com";
                 
                 // Start countdown
                 startCountdown(data.expiresIn || 300);
                 
-                // Show modal
-                accessCodeModal.show();
+                // Show alert
+                accessAlert.style.display = 'block';
+                accessAlert.scrollIntoView({ behavior: 'smooth' });
             }
+            
+            // Close access alert
+            closeAccessAlert.addEventListener('click', function() {
+                accessAlert.style.display = 'none';
+                clearInterval(countdownInterval);
+            });
             
             // Countdown timer
             function startCountdown(duration = 300) {
@@ -615,14 +657,14 @@
                 countdownEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
             
-            // Login button in modal
+            // Login button in alert
             loginBtn.addEventListener('click', function() {
                 showLoading(loginBtn);
                 
                 // Set login flag and additional info in localStorage
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('lastLogin', new Date().getTime());
-        localStorage.setItem('loginProduct', currentProduct);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('lastLogin', new Date().getTime());
+                localStorage.setItem('loginProduct', currentProduct);
                 
                 setTimeout(() => {
                     window.location.href = redirectUrl;
@@ -643,13 +685,6 @@
                     console.error('Gagal menyalin kode: ', err);
                     showToast('Gagal menyalin kode', 'error');
                 });
-            });
-            
-            // Clear interval when modal is closed
-            document.getElementById('accessCodeModal').addEventListener('hidden.bs.modal', function() {
-                clearInterval(countdownInterval);
-                loginBtn.disabled = false;
-                copySuccessMsg.style.display = 'none';
             });
             
             // Helper functions
