@@ -540,6 +540,80 @@
                 });
             }
             
+            // Fungsi untuk menampilkan alert modal
+            function showAlert(message, type = 'error') {
+                // Create modal element
+                const modal = document.createElement('div');
+                modal.className = 'modal fade';
+                modal.id = 'alertModal';
+                modal.tabIndex = '-1';
+                modal.setAttribute('aria-hidden', 'true');
+                
+                // Modal dialog
+                const modalDialog = document.createElement('div');
+                modalDialog.className = 'modal-dialog modal-dialog-centered';
+                
+                // Modal content
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                
+                // Modal header
+                const modalHeader = document.createElement('div');
+                modalHeader.className = `modal-header ${type === 'error' ? 'bg-danger text-white' : 'bg-warning text-dark'}`;
+                
+                const modalTitle = document.createElement('h5');
+                modalTitle.className = 'modal-title';
+                modalTitle.textContent = type === 'error' ? 'Error' : 'Warning';
+                
+                const closeButton = document.createElement('button');
+                closeButton.type = 'button';
+                closeButton.className = 'btn-close';
+                closeButton.setAttribute('data-bs-dismiss', 'modal');
+                closeButton.setAttribute('aria-label', 'Close');
+                if (type === 'error') {
+                    closeButton.className += ' btn-close-white';
+                }
+                
+                modalHeader.appendChild(modalTitle);
+                modalHeader.appendChild(closeButton);
+                
+                // Modal body
+                const modalBody = document.createElement('div');
+                modalBody.className = 'modal-body';
+                modalBody.textContent = message;
+                
+                // Modal footer
+                const modalFooter = document.createElement('div');
+                modalFooter.className = 'modal-footer';
+                
+                const okButton = document.createElement('button');
+                okButton.type = 'button';
+                okButton.className = `btn ${type === 'error' ? 'btn-danger' : 'btn-warning'}`;
+                okButton.setAttribute('data-bs-dismiss', 'modal');
+                okButton.textContent = 'OK';
+                
+                modalFooter.appendChild(okButton);
+                
+                // Assemble modal
+                modalContent.appendChild(modalHeader);
+                modalContent.appendChild(modalBody);
+                modalContent.appendChild(modalFooter);
+                modalDialog.appendChild(modalContent);
+                modal.appendChild(modalDialog);
+                
+                // Add modal to body
+                document.body.appendChild(modal);
+                
+                // Initialize and show modal
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+                
+                // Remove modal after it's hidden
+                modal.addEventListener('hidden.bs.modal', () => {
+                    document.body.removeChild(modal);
+                });
+            }
+            
             // Fungsi untuk menampilkan loading global
             function showGlobalLoading() {
                 globalLoading.style.display = 'flex';
@@ -653,6 +727,8 @@
                         updateStepIndicator(3);
                         showToast('Email terverifikasi', 'success');
                     } else {
+                        // Show alert modal for invalid username/email
+                        showAlert('Username atau email tidak cocok dengan data yang ada. Pastikan Anda telah memasukkan informasi yang benar dan telah melakukan pembelian produk.', 'error');
                         throw new Error(data.message || "Email tidak terdaftar untuk username ini");
                     }
                 } catch (error) {
@@ -732,6 +808,8 @@
                         
                         showToast('Kode akses berhasil dibuat', 'success');
                     } else {
+                        // Show alert modal for invalid product selection
+                        showAlert('Produk yang dipilih tidak valid untuk kombinasi username dan email ini. Pastikan Anda telah membeli produk yang dipilih.', 'error');
                         throw new Error(data.message || "Gagal mendapatkan kode akses");
                     }
                 } catch (error) {
