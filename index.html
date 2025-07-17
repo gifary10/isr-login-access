@@ -417,12 +417,6 @@
                         <div class="access-code-display" id="accessCodeDisplay">
                             <span id="generatedAccessCode"></span>
                         </div>
-                        <div class="text-center">
-                            <span class="badge bg-warning text-dark countdown-badge">
-                                <i class="fas fa-clock me-1"></i>
-                                <span id="countdown">05:00</span>
-                            </span>
-                        </div>
                     </div>
                     
                     <div class="d-flex justify-content-between">
@@ -483,7 +477,6 @@
             const emailDisplayFinal = document.getElementById('emailDisplayFinal');
             const productDisplay = document.getElementById('productDisplay');
             const accessCodeDisplay = document.getElementById('generatedAccessCode');
-            const countdownElement = document.getElementById('countdown');
             const continueBtn = document.getElementById('continueBtn');
             const backToProductBtn = document.getElementById('backToProductBtn');
             
@@ -505,8 +498,6 @@
             let currentProduct = "";
             let currentAccessCode = "";
             let redirectUrl = "https://gifary10.github.io/isr-login-access/";
-            let countdownInterval;
-            let timeLeft = 300; // 5 minutes in seconds
 
             // Fungsi untuk menampilkan toast notifikasi
             function showToast(message, type = 'success') {
@@ -599,31 +590,6 @@
                 }
             }
             
-            // Format waktu countdown
-            function formatTime(seconds) {
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }
-            
-            // Start countdown timer
-            function startCountdown() {
-                clearInterval(countdownInterval);
-                timeLeft = 300;
-                countdownElement.textContent = formatTime(timeLeft);
-                
-                countdownInterval = setInterval(() => {
-                    timeLeft--;
-                    countdownElement.textContent = formatTime(timeLeft);
-                    
-                    if (timeLeft <= 0) {
-                        clearInterval(countdownInterval);
-                        showToast('Kode akses telah kedaluwarsa', 'warning');
-                        continueBtn.disabled = true;
-                    }
-                }, 1000);
-            }
-            
             // Submit username
             submitUsernameBtn.addEventListener('click', function() {
                 const username = usernameInput.value.trim();
@@ -710,7 +676,6 @@
                 accessCodeSection.style.display = 'none';
                 productDropdownSection.style.display = 'block';
                 updateStepIndicator(3);
-                clearInterval(countdownInterval);
             });
 
             // Populate produk dropdown
@@ -765,7 +730,6 @@
                         accessCodeSection.style.display = 'block';
                         updateStepIndicator(4);
                         
-                        startCountdown();
                         showToast('Kode akses berhasil dibuat', 'success');
                     } else {
                         throw new Error(data.message || "Gagal mendapatkan kode akses");
