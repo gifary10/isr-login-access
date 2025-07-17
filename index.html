@@ -320,6 +320,81 @@
                 padding: 1rem;
             }
         }
+
+        /* Step indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: #9e9e9e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            color: #9e9e9e;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-label,
+        .step.completed .step-label {
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e0e0e0;
+            z-index: 0;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 2px;
+            background-color: var(--primary);
+            z-index: 1;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -351,27 +426,70 @@
             
             <div id="mainSection">
                 <h3 class="form-title">Selamat Datang</h3>
-                <p class="text-center text-muted mb-4">Masukkan Email Saat Pembelian di Lynk.id</p>
                 
-                <!-- Email Input Form -->
-                <div class="mb-3">
-                    <input type="email" class="form-control py-2" id="emailInput" placeholder="Masukkan Email Anda">
-                    <div class="error-message" id="emailError"></div>
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" id="step1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Username</div>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Email</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Produk</div>
+                    </div>
+                    <div class="step" id="step4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Kode Akses</div>
+                    </div>
+                    <div class="progress-bar" id="progressBar" style="width: 25%;"></div>
                 </div>
                 
-                <button class="btn btn-primary w-100 py-2" id="submitEmailBtn">
-                    <span id="submitEmailBtnText">Verifikasi</span>
-                    <span id="submitEmailBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                </button>
+                <!-- Username Input Form -->
+                <div id="usernameSection">
+                    <p class="text-center text-muted mb-4">Masukkan Username Anda</p>
+                    <div class="mb-3">
+                        <input type="text" class="form-control py-2" id="usernameInput" placeholder="Masukkan Username">
+                        <div class="error-message" id="usernameError"></div>
+                    </div>
+                    
+                    <button class="btn btn-primary w-100 py-2" id="submitUsernameBtn">
+                        <span id="submitUsernameBtnText">Lanjutkan</span>
+                        <span id="submitUsernameBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                </div>
                 
-                <!-- Product Dropdown (akan ditampilkan setelah email divalidasi) -->
+                <!-- Email Input Form (hidden initially) -->
+                <div id="emailSection" style="display: none;">
+                    <p class="text-center text-muted mb-4">Masukkan Email Saat Pembelian di Lynk.id</p>
+                    <div class="mb-3">
+                        <input type="email" class="form-control py-2" id="emailInput" placeholder="Masukkan Email Anda">
+                        <div class="error-message" id="emailError"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-secondary me-2" id="backToUsernameBtn">
+                            <i class="fas fa-arrow-left me-1"></i> Kembali
+                        </button>
+                        <button class="btn btn-primary flex-grow-1" id="submitEmailBtn">
+                            <span id="submitEmailBtnText">Verifikasi</span>
+                            <span id="submitEmailBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Product Dropdown (hidden initially) -->
                 <div id="productDropdownSection" style="display: none;">
-                    <div class="user-email-display mt-4">
+                    <div class="user-email-display mt-2 mb-3">
                         <i class="fas fa-user-circle me-2"></i>
+                        <span id="usernameDisplay" class="me-2"></span>
                         <span id="emailDisplay"></span>
                     </div>
                     
-                    <div class="mb-3 mt-3">
+                    <div class="mb-3">
                         <label for="product" class="form-label">Pilih Produk</label>
                         <select class="form-select py-2" id="product">
                             <option selected disabled>-- Pilih Produk --</option>
@@ -379,34 +497,43 @@
                         <div class="error-message" id="productError"></div>
                     </div>
                     
-                    <button class="btn btn-primary w-100 py-2" id="verifyBtn">
-                        <span id="verifyBtnText">Verifikasi Akses</span>
-                        <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                    </button>
-                </div>
-
-                <!-- Access Code Alert (replaces modal) -->
-                <div class="access-alert" id="accessAlert">
-                    <div class="access-alert-header">
-                        <h5 class="access-alert-title" id="productTitleAlert"></h5>
-                        <button class="access-alert-close" id="closeAccessAlert">&times;</button>
-                    </div>
-                    <p class="mb-3">Kode Akses:</p>
-                    <div class="access-code-display animate__animated animate__pulse" id="accessCodeDisplay">
-                        <button class="copy-btn" id="copyAccessCodeBtn" title="Salin kode">
-                            <i class="fas fa-copy"></i>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-secondary me-2" id="backToEmailBtn">
+                            <i class="fas fa-arrow-left me-1"></i> Kembali
+                        </button>
+                        <button class="btn btn-primary flex-grow-1" id="verifyBtn">
+                            <span id="verifyBtnText">Verifikasi</span>
+                            <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
                         </button>
                     </div>
-                    <div class="mt-3">
-                        <span class="badge countdown-badge bg-warning text-dark" id="countdown">05:00</span>
+                </div>
+
+                <!-- Access Code Section (hidden initially) -->
+                <div id="accessCodeSection" style="display: none;">
+                    <div class="user-email-display mt-2 mb-3">
+                        <i class="fas fa-user-circle me-2"></i>
+                        <span id="usernameDisplayFinal" class="me-2"></span>
+                        <span id="emailDisplayFinal"></span>
                     </div>
-                    <p class="text-muted small mt-2">Kode akan kadaluarsa dalam <span id="expiryText">5 menit</span></p>
-                    <div class="success-message" id="copySuccessMsg">Kode berhasil disalin!</div>
                     
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="button" class="btn btn-primary" id="loginBtn">
-                            <span id="loginBtnText">Masuk ke Sistem</span>
-                            <span class="spinner-border spinner-border-sm d-none" id="loginSpinner"></span>
+                    <div class="mb-3">
+                        <label for="productDisplay" class="form-label">Produk Terpilih</label>
+                        <input type="text" class="form-control py-2" id="productDisplay" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="accessCodeInput" class="form-label">Masukkan Kode Akses</label>
+                        <input type="text" class="form-control py-2 text-center" id="accessCodeInput" placeholder="Masukkan 6 digit kode">
+                        <div class="error-message" id="accessCodeError"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-secondary me-2" id="backToProductBtn">
+                            <i class="fas fa-arrow-left me-1"></i> Kembali
+                        </button>
+                        <button class="btn btn-primary flex-grow-1" id="submitAccessCodeBtn">
+                            <span id="submitAccessCodeBtnText">Masuk ke Sistem</span>
+                            <span id="submitAccessCodeBtnSpinner" class="spinner-border spinner-border-sm d-none"></span>
                         </button>
                     </div>
                 </div>
@@ -436,28 +563,49 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
+            const usernameInput = document.getElementById('usernameInput');
+            const usernameError = document.getElementById('usernameError');
+            const submitUsernameBtn = document.getElementById('submitUsernameBtn');
+            
             const emailInput = document.getElementById('emailInput');
             const emailError = document.getElementById('emailError');
             const submitEmailBtn = document.getElementById('submitEmailBtn');
+            const backToUsernameBtn = document.getElementById('backToUsernameBtn');
+            
             const productDropdownSection = document.getElementById('productDropdownSection');
             const verifyBtn = document.getElementById('verifyBtn');
+            const usernameDisplay = document.getElementById('usernameDisplay');
             const emailDisplay = document.getElementById('emailDisplay');
             const productSelect = document.getElementById('product');
             const productError = document.getElementById('productError');
+            const backToEmailBtn = document.getElementById('backToEmailBtn');
+            
+            const accessCodeSection = document.getElementById('accessCodeSection');
+            const usernameDisplayFinal = document.getElementById('usernameDisplayFinal');
+            const emailDisplayFinal = document.getElementById('emailDisplayFinal');
+            const productDisplay = document.getElementById('productDisplay');
+            const accessCodeInput = document.getElementById('accessCodeInput');
+            const accessCodeError = document.getElementById('accessCodeError');
+            const submitAccessCodeBtn = document.getElementById('submitAccessCodeBtn');
+            const backToProductBtn = document.getElementById('backToProductBtn');
+            
             const globalLoading = document.getElementById('globalLoading');
-            const copyAccessCodeBtn = document.getElementById('copyAccessCodeBtn');
-            const copySuccessMsg = document.getElementById('copySuccessMsg');
-            const accessAlert = document.getElementById('accessAlert');
-            const closeAccessAlert = document.getElementById('closeAccessAlert');
             
-            // Alert Elements
-            const productTitleAlert = document.getElementById('productTitleAlert');
-            const accessCodeDisplay = document.getElementById('accessCodeDisplay');
-            const countdownEl = document.getElementById('countdown');
-            const loginBtn = document.getElementById('loginBtn');
+            // Step indicators
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            const step4 = document.getElementById('step4');
+            const progressBar = document.getElementById('progressBar');
             
+            // Sections
+            const usernameSection = document.getElementById('usernameSection');
+            const emailSection = document.getElementById('emailSection');
+            
+            let currentUsername = "";
             let currentEmail = "";
             let currentProduct = "";
+            let currentAccessCode = "";
             let redirectUrl = "";
             let countdownInterval;
 
@@ -517,6 +665,71 @@
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
             }
             
+            // Update step indicator
+            function updateStepIndicator(currentStep) {
+                // Reset all steps
+                step1.classList.remove('active', 'completed');
+                step2.classList.remove('active', 'completed');
+                step3.classList.remove('active', 'completed');
+                step4.classList.remove('active', 'completed');
+                
+                // Update progress based on current step
+                switch(currentStep) {
+                    case 1:
+                        step1.classList.add('active');
+                        progressBar.style.width = '25%';
+                        break;
+                    case 2:
+                        step1.classList.add('completed');
+                        step2.classList.add('active');
+                        progressBar.style.width = '50%';
+                        break;
+                    case 3:
+                        step1.classList.add('completed');
+                        step2.classList.add('completed');
+                        step3.classList.add('active');
+                        progressBar.style.width = '75%';
+                        break;
+                    case 4:
+                        step1.classList.add('completed');
+                        step2.classList.add('completed');
+                        step3.classList.add('completed');
+                        step4.classList.add('active');
+                        progressBar.style.width = '100%';
+                        break;
+                }
+            }
+            
+            // Submit username
+            submitUsernameBtn.addEventListener('click', function() {
+                const username = usernameInput.value.trim();
+                
+                // Validasi username
+                if (!username) {
+                    showError("Username harus diisi", usernameError);
+                    return;
+                }
+                
+                if (username.length < 3) {
+                    showError("Username minimal 3 karakter", usernameError);
+                    return;
+                }
+                
+                currentUsername = username;
+                
+                // Hide username section, show email section
+                usernameSection.style.display = 'none';
+                emailSection.style.display = 'block';
+                updateStepIndicator(2);
+            });
+            
+            // Back to username
+            backToUsernameBtn.addEventListener('click', function() {
+                emailSection.style.display = 'none';
+                usernameSection.style.display = 'block';
+                updateStepIndicator(1);
+            });
+            
             // Submit email
             submitEmailBtn.addEventListener('click', async function() {
                 const email = emailInput.value.trim();
@@ -541,10 +754,13 @@
 
                     if (data.success) {
                         // Tampilkan produk yang tersedia
+                        usernameDisplay.textContent = currentUsername;
                         emailDisplay.textContent = email;
                         populateProducts(data.products);
+                        emailSection.style.display = 'none';
                         productDropdownSection.style.display = 'block';
                         emailError.style.display = 'none';
+                        updateStepIndicator(3);
                         showToast('Email terverifikasi', 'success');
                     } else {
                         throw new Error(data.message || "Email tidak terdaftar");
@@ -554,8 +770,22 @@
                     showError(error.message, emailError);
                     showToast('Error: ' + error.message, 'error');
                 } finally {
-                    hideLoading(submitEmailBtn, "Lanjutkan");
+                    hideLoading(submitEmailBtn, "Verifikasi");
                 }
+            });
+            
+            // Back to email
+            backToEmailBtn.addEventListener('click', function() {
+                productDropdownSection.style.display = 'none';
+                emailSection.style.display = 'block';
+                updateStepIndicator(2);
+            });
+            
+            // Back to product
+            backToProductBtn.addEventListener('click', function() {
+                accessCodeSection.style.display = 'none';
+                productDropdownSection.style.display = 'block';
+                updateStepIndicator(3);
             });
 
             // Populate produk dropdown
@@ -597,7 +827,19 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        showAccessAlert(data);
+                        currentAccessCode = data.accessCode;
+                        redirectUrl = data.redirectUrl || "https://default.isrproject.com";
+                        
+                        // Show access code section
+                        usernameDisplayFinal.textContent = currentUsername;
+                        emailDisplayFinal.textContent = currentEmail;
+                        productDisplay.value = currentProduct;
+                        
+                        productDropdownSection.style.display = 'none';
+                        accessCodeSection.style.display = 'block';
+                        updateStepIndicator(4);
+                        
+                        showToast('Kode akses telah dikirim', 'success');
                     } else {
                         throw new Error(data.message || "Gagal mendapatkan kode akses");
                     }
@@ -610,81 +852,31 @@
                 }
             });
             
-            // Show access alert (replaces modal)
-            function showAccessAlert(data) {
-                productTitleAlert.textContent = currentProduct;
-                accessCodeDisplay.textContent = data.accessCode;
-                redirectUrl = data.redirectUrl || "https://default.isrproject.com";
+            // Submit access code
+            submitAccessCodeBtn.addEventListener('click', function() {
+                const enteredCode = accessCodeInput.value.trim();
                 
-                // Start countdown
-                startCountdown(data.expiresIn || 300);
+                if (!enteredCode) {
+                    showError("Masukkan kode akses", accessCodeError);
+                    return;
+                }
                 
-                // Show alert
-                accessAlert.style.display = 'block';
-                accessAlert.scrollIntoView({ behavior: 'smooth' });
-            }
-            
-            // Close access alert
-            closeAccessAlert.addEventListener('click', function() {
-                accessAlert.style.display = 'none';
-                clearInterval(countdownInterval);
-            });
-            
-            // Countdown timer
-            function startCountdown(duration = 300) {
-                clearInterval(countdownInterval);
-                let timer = duration;
+                if (enteredCode !== currentAccessCode) {
+                    showError("Kode akses tidak valid", accessCodeError);
+                    return;
+                }
                 
-                updateCountdownDisplay(timer);
-                
-                countdownInterval = setInterval(() => {
-                    timer--;
-                    updateCountdownDisplay(timer);
-                    
-                    if (timer <= 0) {
-                        clearInterval(countdownInterval);
-                        loginBtn.disabled = true;
-                        countdownEl.className = 'badge countdown-badge bg-danger';
-                        countdownEl.textContent = 'KADALUARSA';
-                        showToast('Kode akses telah kadaluarsa', 'warning');
-                    }
-                }, 1000);
-            }
-            
-            function updateCountdownDisplay(seconds) {
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                countdownEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }
-            
-            // Login button in alert
-            loginBtn.addEventListener('click', function() {
-                showLoading(loginBtn);
+                showLoading(submitAccessCodeBtn);
                 
                 // Set login flag and additional info in localStorage
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('lastLogin', new Date().getTime());
                 localStorage.setItem('loginProduct', currentProduct);
+                localStorage.setItem('username', currentUsername);
                 
                 setTimeout(() => {
                     window.location.href = redirectUrl;
                 }, 1000);
-            });
-            
-            // Copy access code to clipboard
-            copyAccessCodeBtn.addEventListener('click', function() {
-                const code = accessCodeDisplay.textContent;
-                navigator.clipboard.writeText(code).then(() => {
-                    copySuccessMsg.style.display = 'block';
-                    copySuccessMsg.classList.add('animate__animated', 'animate__fadeIn');
-                    setTimeout(() => {
-                        copySuccessMsg.style.display = 'none';
-                    }, 2000);
-                    showToast('Kode berhasil disalin ke clipboard!', 'success');
-                }).catch(err => {
-                    console.error('Gagal menyalin kode: ', err);
-                    showToast('Gagal menyalin kode', 'error');
-                });
             });
             
             // Helper functions
@@ -719,12 +911,20 @@
             }
             
             // Clear error on input change
+            usernameInput.addEventListener('input', () => {
+                usernameError.style.display = 'none';
+            });
+            
             emailInput.addEventListener('input', () => {
                 emailError.style.display = 'none';
             });
             
             productSelect.addEventListener('change', () => {
                 productError.style.display = 'none';
+            });
+            
+            accessCodeInput.addEventListener('input', () => {
+                accessCodeError.style.display = 'none';
             });
         });
     </script>
