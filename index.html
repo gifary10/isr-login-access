@@ -181,28 +181,116 @@
             deferredPrompt = e;
             
             // Show install button after 5 seconds
-            setTimeout(() => {
-                if (deferredPrompt) {
-                    const installButton = document.createElement('button');
-                    installButton.textContent = 'Install App';
-                    installButton.style.position = 'fixed';
-                    installButton.style.bottom = '20px';
-                    installButton.style.right = '20px';
-                    installButton.style.zIndex = '1000';
-                    installButton.classList.add('btn', 'btn-primary');
-                    installButton.onclick = () => {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('User accepted install');
-                            }
-                            deferredPrompt = null;
-                            installButton.remove();
-                        });
-                    };
-                    document.body.appendChild(installButton);
+setTimeout(() => {
+    if (deferredPrompt) {
+        const installContainer = document.createElement('div');
+        installContainer.style.position = 'fixed';
+        installContainer.style.top = '20px';
+        installContainer.style.left = '0';
+        installContainer.style.right = '0';
+        installContainer.style.display = 'flex';
+        installContainer.style.flexDirection = 'column';
+        installContainer.style.alignItems = 'center';
+        installContainer.style.zIndex = '1000';
+        installContainer.style.gap = '10px';
+        
+        // Create logo element
+        const logo = document.createElement('img');
+        logo.src = 'logoh.png';
+        logo.style.width = 'auto';
+        logo.style.height = '30px';
+        logo.style.objectFit = 'contain';
+        logo.style.animation = 'pulse 2s infinite';
+        logo.style.marginRight = '10px'; // Spasi antara logo dan teks
+        
+        // Create text span for the button
+        const buttonText = document.createElement('span');
+        buttonText.textContent = 'Install Aplikasi';
+        
+        // Create install button
+        const installButton = document.createElement('button');
+        installButton.style.padding = '10px 22px';
+        installButton.style.borderRadius = '30px';
+        installButton.style.background = 'linear-gradient(90deg, #2A7B9B, #57C785, #EDDD53 )';
+        installButton.style.color = 'black';
+        installButton.style.border = 'none';
+        installButton.style.fontWeight = 'bold';
+        installButton.style.fontSize = '16px';
+        installButton.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+        installButton.style.cursor = 'pointer';
+        installButton.style.transition = 'all 0.3s ease';
+        installButton.style.transform = 'translateY(-50px)';
+        installButton.style.opacity = '0';
+        installButton.style.animation = 'pulse 2s infinite';
+        installButton.style.display = 'flex';
+        installButton.style.alignItems = 'center';
+        installButton.style.justifyContent = 'center';
+        
+        // Add logo and text to button
+        installButton.appendChild(logo);
+        installButton.appendChild(buttonText);
+        
+        // Add hover effects
+        installButton.onmouseenter = () => {
+            installButton.style.transform = 'translateY(0) scale(1.05)';
+            installButton.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)';
+            installButton.style.animation = 'none';
+        };
+        
+        installButton.onmouseleave = () => {
+            installButton.style.transform = 'translateY(0)';
+            installButton.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+            installButton.style.animation = 'pulse 2s infinite';
+        };
+        
+        // Add animation when showing
+        setTimeout(() => {
+            installButton.style.transform = 'translateY(0)';
+            installButton.style.opacity = '1';
+        }, 10);
+        
+        installButton.onclick = () => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted install');
+                    // Add click animation
+                    installButton.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        installButton.style.transform = 'scale(1)';
+                    }, 100);
                 }
-            }, 5000);
+                deferredPrompt = null;
+                // Add fade-out animation before removing
+                installContainer.style.opacity = '0';
+                installContainer.style.transform = 'translateY(-50px)';
+                installContainer.style.transition = 'all 0.5s ease';
+                setTimeout(() => {
+                    installContainer.remove();
+                }, 500);
+            });
+        };
+        
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Add button to container
+        installContainer.appendChild(installButton);
+        document.body.appendChild(installContainer);
+    }
+}, 2000);
         });
     </script>
 </body>
