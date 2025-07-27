@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ISR Access</title>
     <meta name="theme-color" content="#fa800c" />
+    <meta name="description" content="Integrated Safety Report Access">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ISR">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
     <link rel="preconnect" href="https://script.google.com">
     <link rel="dns-prefetch" href="https://script.google.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
@@ -65,7 +73,7 @@
                 <div class="progress-bar" id="progressBar" style="width: 25%;"></div>
             </div>
             
-            <div id="usernameSection">
+           <div id="usernameSection">
                 <div class="mb-3">
                     <input type="text" class="form-control py-2" id="usernameInput" placeholder="Masukkan Username" autocomplete="username">
                     <div class="error-message" id="usernameError"></div>
@@ -138,6 +146,7 @@
                     </button>
                 </div>
             </div>
+        
         </div>
     </main>
 
@@ -150,5 +159,51 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="js/cores.js"></script>
     <script type="module" src="js/handlers.js"></script>
+    
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button after 5 seconds
+            setTimeout(() => {
+                if (deferredPrompt) {
+                    const installButton = document.createElement('button');
+                    installButton.textContent = 'Install App';
+                    installButton.style.position = 'fixed';
+                    installButton.style.bottom = '20px';
+                    installButton.style.right = '20px';
+                    installButton.style.zIndex = '1000';
+                    installButton.classList.add('btn', 'btn-primary');
+                    installButton.onclick = () => {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                console.log('User accepted install');
+                            }
+                            deferredPrompt = null;
+                            installButton.remove();
+                        });
+                    };
+                    document.body.appendChild(installButton);
+                }
+            }, 5000);
+        });
+    </script>
 </body>
 </html>
