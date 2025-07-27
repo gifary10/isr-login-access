@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#fa800c",
-  "description": "Integrated Safety Report Access",
+  "description": "Integrated Safety Report",
   "icons": [
     {
       "src": "icons/icon-192x192.png",
