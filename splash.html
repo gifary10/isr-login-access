@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ISR Elegant Splash</title>
   <meta name="theme-color" content="#fa800c" />
+  <meta name="description" content="Integrated Safety Report">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ISR">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+  
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" as="style">
   <link rel="preload" href="logoh.png" as="image">
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" as="script">
@@ -35,5 +43,20 @@
 
   <script src="assets/nodeline.js"></script>
   <script src="assets/main.js"></script>
+  
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        });
+    }
+  </script>
 </body>
 </html>
