@@ -5,20 +5,21 @@ const ui = {
   showLoading: (button) => {
     const spinner = button.querySelector('.spinner-border');
     const text = button.querySelector('span:not(.spinner-border)');
-    spinner.classList.remove('d-none');
-    text.classList.add('d-none');
+    if (spinner) spinner.classList.remove('d-none');
+    if (text) text.classList.add('d-none');
     button.disabled = true;
   },
 
   hideLoading: (button) => {
     const spinner = button.querySelector('.spinner-border');
     const text = button.querySelector('span:not(.spinner-border)');
-    spinner.classList.add('d-none');
-    text.classList.remove('d-none');
+    if (spinner) spinner.classList.add('d-none');
+    if (text) text.classList.remove('d-none');
     button.disabled = false;
   },
 
   showError: (message, element) => {
+    if (!element) return;
     element.textContent = message;
     element.style.display = 'block';
     element.classList.add('shake');
@@ -27,8 +28,20 @@ const ui = {
 
   clearErrors: () => {
     Object.values(elements.errors).forEach(error => {
-      error.style.display = 'none';
+      if (error) error.style.display = 'none';
     });
+  },
+
+  showGlobalLoading: () => {
+    if (elements.loadingOverlay) {
+      elements.loadingOverlay.style.display = 'flex';
+    }
+  },
+
+  hideGlobalLoading: () => {
+    if (elements.loadingOverlay) {
+      elements.loadingOverlay.style.display = 'none';
+    }
   }
 };
 
@@ -48,14 +61,12 @@ const api = {
         utils.showSection('product');
         utils.updateStepIndicator(3);
       } else {
-        // Show toast notification for verification failure
         utils.showToast(
           'Verifikasi Gagal', 
           'Username dan email tidak sesuai dengan data pada saat pembelian di lynk.id. Silakan periksa kembali.', 
           'error'
         );
         
-        // Clear email input and focus on it
         elements.inputs.email.value = '';
         elements.inputs.email.focus();
         
@@ -67,6 +78,7 @@ const api = {
       } else {
         ui.showError(error.message, elements.errors.email);
       }
+      throw error;
     } finally {
       ui.hideLoading(elements.buttons.submitEmail);
     }
@@ -99,6 +111,7 @@ const api = {
       } else {
         ui.showError(error.message, elements.errors.product);
       }
+      throw error;
     } finally {
       ui.hideLoading(elements.buttons.verify);
     }
@@ -107,6 +120,7 @@ const api = {
 
 // Event Handlers
 const handleUsernameSubmit = () => {
+  ui.clearErrors();
   const username = utils.sanitizeInput(elements.inputs.username.value.trim());
   
   if (!username) {
@@ -125,6 +139,7 @@ const handleUsernameSubmit = () => {
 };
 
 const handleEmailSubmit = async () => {
+  ui.clearErrors();
   const email = utils.sanitizeInput(elements.inputs.email.value.trim().toLowerCase());
   
   if (!email) {
@@ -137,7 +152,6 @@ const handleEmailSubmit = async () => {
     return;
   }
   
-  // Check for common email providers
   const commonProviders = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com'];
   const domain = email.split('@')[1];
   if (!commonProviders.includes(domain)) {
@@ -152,6 +166,7 @@ const handleEmailSubmit = async () => {
 };
 
 const handleProductVerify = async () => {
+  ui.clearErrors();
   if (!elements.inputs.product.value || elements.inputs.product.disabled) {
     ui.showError("Silakan pilih produk", elements.errors.product);
     return;
@@ -165,7 +180,6 @@ const handleProductVerify = async () => {
 const handleContinue = () => {
   ui.showLoading(elements.buttons.continue);
   
-  // Set login data with expiration (24 hours)
   const loginData = {
     isLoggedIn: true,
     username: state.user.username,
@@ -174,12 +188,15 @@ const handleContinue = () => {
   };
   localStorage.setItem('isrAuthData', JSON.stringify(loginData));
   
+  // Pastikan spinner dihentikan sebelum redirect
   setTimeout(() => {
+    ui.hideLoading(elements.buttons.continue);
     window.location.href = state.redirectUrl;
-  }, 1000);
+  }, 500);
 };
 
 const handleBackNavigation = () => {
+  ui.clearErrors();
   if (elements.sections.email.style.display === 'block') {
     utils.showSection('username');
     utils.updateStepIndicator(1);
@@ -217,6 +234,9 @@ const setupInputListeners = () => {
 
 // Initialize Event Listeners
 const initEventListeners = () => {
+  // Reset form state saat halaman dimuat atau dimuat ulang
+  utils.resetFormState();
+
   elements.buttons.submitUsername.addEventListener('click', handleUsernameSubmit);
   elements.buttons.submitEmail.addEventListener('click', handleEmailSubmit);
   elements.buttons.verify.addEventListener('click', handleProductVerify);
@@ -224,6 +244,11 @@ const initEventListeners = () => {
   
   document.querySelectorAll('.back-btn').forEach(btn => {
     btn.addEventListener('click', handleBackNavigation);
+  });
+  
+  // Handle browser back button
+  window.addEventListener('popstate', () => {
+    utils.resetFormState();
   });
   
   setupInputListeners();
