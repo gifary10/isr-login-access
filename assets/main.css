@@ -15,7 +15,7 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: var(--bg-color);
+  background: linear-gradient(180deg, #fa800c 0%, #fa800c 1%, #ffffff 15%, #ffffff 100%);
   color: var(--text-color);
   min-height: 100vh;
   overflow: hidden;
