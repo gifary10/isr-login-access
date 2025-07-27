@@ -10,6 +10,13 @@
     --gray-medium: #9e9e9e;
     --animation-duration: 0.3s;
 }
+/* Tambahkan di bagian atas (setelah :root) */
+body {
+    background: linear-gradient(180deg, var(--primary) 0%, var(--primary) 1%, #ffffff 15%, #ffffff 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+  
+}
 
 /* Base Styles */
 html, body {
