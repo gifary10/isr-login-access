@@ -59,7 +59,8 @@ const elements = {
     toast: new bootstrap.Toast(document.getElementById('liveToast')),
     toastTitle: document.getElementById('toastTitle'),
     toastMessage: document.getElementById('toastMessage')
-  }
+  },
+  loadingOverlay: document.getElementById('globalLoading')
 };
 
 // Utility Functions
@@ -161,6 +162,24 @@ const utils = {
 
   sanitizeInput: (input) => {
     return input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  },
+
+  resetFormState: () => {
+    // Reset all buttons state
+    Object.values(elements.buttons).forEach(button => {
+      if (button) {
+        const spinner = button.querySelector('.spinner-border');
+        const text = button.querySelector('span:not(.spinner-border)');
+        if (spinner) spinner.classList.add('d-none');
+        if (text) text.classList.remove('d-none');
+        button.disabled = false;
+      }
+    });
+    
+    // Hide global loading if shown
+    if (elements.loadingOverlay) {
+      elements.loadingOverlay.style.display = 'none';
+    }
   }
 };
 
@@ -191,6 +210,7 @@ const productManager = {
 
 // Initialize App
 function init() {
+  utils.resetFormState();
   utils.showSection('username');
   utils.updateStepIndicator(1);
 }
