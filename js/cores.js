@@ -1,6 +1,6 @@
 // Google Sheets API Configuration
 const API_CONFIG = {
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwEjl7ig0V9_AzBrgEhxpjL6JQI8-Mmy3tl0GTq0FbJ67Q2PSv5FOn9HMp93j8VpT7YCA/exec",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxMELW-9XwBvv8838IhqIOiI6Zat-kuxXnDo8oVOwl0Vxcq2HNYcQvzAl-DFKiL2J3t-g/exec",
   TIMEOUTS: {
     VERIFY_EMAIL: 10000,
     GET_ACCESS_CODE: 15000
