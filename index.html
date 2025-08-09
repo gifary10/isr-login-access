@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+  <meta name="theme-color" content="#303030" />
+  <title>Login Access</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          sans: ['Roboto', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: '#fa800c',
+            'primary-light': '#ff9a3c',
+            'primary-dark': '#e06a00',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 gradient-bg">
+  <div id="toast" class="fixed top-4 right-4 hidden" style="z-index: var(--z-toast);">
+    <div class="toast-content bg-white shadow-lg rounded-lg overflow-hidden w-auto max-w-md border-l-4">
+      <div class="flex items-start p-4">
+        <div class="toast-icon flex-shrink-0"></div>
+        <div class="ml-3 flex-1 pt-0.5">
+          <p class="toast-message text-sm font-medium text-gray-900"></p>
+        </div>
+        <div class="ml-4 flex-shrink-0 flex">
+          <button class="toast-close bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
+            <span class="sr-only">Close</span>
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="access-card">
+    <div class="card-header animated-header">
+      <img src="logop.png" alt="Logo" class="h-14 mb-1 mx-auto" loading="lazy">
+    </div>
+
+    <div class="step-indicator">
+      <div class="step active" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-label">Verifikasi</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-label">Produk</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-label">Kode</div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div id="userSection" class="space-y-4">
+        <div>
+          <label for="user" class="block text-gray-700 text-sm font-medium mb-1">Nama User:</label>
+          <input type="text" id="user" placeholder="Masukkan nama" 
+                 class="form-control" autocomplete="name" required>
+        </div>
+
+        <div>
+          <label for="email" class="block text-gray-700 text-sm font-medium mb-1">Email:</label>
+          <div class="flex">
+            <input type="email" id="email" placeholder="Masukkan email" 
+                  class="form-control rounded-r-none" autocomplete="email" required>
+            <span class="inline-flex items-center px-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md text-gray-700 text-sm">
+              @gmail.com
+            </span>
+          </div>
+        </div>
+
+        <div class="flex space-x-3">
+        <button id="helpBtn" class="w-full btn-secondary btn-hover">
+          Informasi
+        </button>
+        <button id="verifyBtn" class="w-full btn-primary btn-hover">
+          Verifikasi
+        </button>
+        </div>
+      </div>
+
+      <div id="produkSection" class="space-y-4 hidden" aria-live="polite">
+        <div>
+          <label for="produk" class="block text-gray-700 text-sm font-medium mb-1">Pilih Produk:</label>
+          <select id="produk" class="form-control" required>
+            <option value="">-- Pilih Produk --</option>
+          </select>
+        </div>
+
+        <div class="flex space-x-3">
+          <button id="backToUserBtn" class="w-1/2 btn-secondary btn-hover">
+            Kembali
+          </button>
+          <button id="selectProdukBtn" class="w-1/2 btn-primary btn-hover">
+            Lanjut
+          </button>
+        </div>
+      </div>
+
+      <div id="kodeSection" class="space-y-4 hidden" aria-live="polite">
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-sm text-gray-600"><span class="font-medium">User:</span> <span id="displayUser"></span></p>
+          <p class="text-sm text-gray-600 mt-1"><span class="font-medium">Email:</span> <span id="displayEmail"></span></p>
+          <p class="text-sm text-gray-600 mt-1"><span class="font-medium">Produk:</span> <span id="displayProduk"></span></p>
+        </div>
+
+        <div>
+          <label for="kode" class="block text-gray-700 text-sm font-medium mb-1">Kode Akses:</label>
+          <input type="text" id="kode" placeholder="Masukkan kode akses" 
+                class="form-control" autocomplete="one-time-code" required>
+        </div>
+
+        <div class="flex space-x-3">
+          <button id="backToProdukBtn" class="w-1/2 btn-secondary btn-hover">
+            Kembali
+          </button>
+          <button id="checkKodeBtn" class="w-1/2 btn-primary btn-hover">
+            Akses
+          </button>
+        </div>
+      </div>
+
+      <div id="loadingIndicator" class="hidden text-center py-4">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        <p class="mt-2 text-gray-600">Memproses...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4" style="z-index: var(--z-modal);">
+    <div class="bg-white rounded-lg max-w-md w-full p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900">Panduan Login</h3>
+        <button id="closeHelpModal" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-3 text-sm text-gray-700">
+        <p>Berikut panduan untuk login ke aplikasi:</p>
+        <ol class="list-decimal pl-5 space-y-2">
+          <li>Anda dapat login jika sudah melakukan pembelian melalui link <strong>lynk.id/gifary10</strong></li>
+          <li>Username dan email harus diisi sesuai dengan isian pada saat pembelian di lynk.id</li>
+          <li>Kode akses akan dikirimkan melalui email setelah melakukan pembelian dari lynk.id beserta dengan informasi username, email, produk dan kode akses</li>
+        </ol>
+      </div>
+      <div class="mt-4">
+        <button id="confirmHelpModal" class="w-full btn-primary btn-hover">
+          Mengerti
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="fetch.js"></script>
+  <script src="access-control.js"></script>
+  <script src="offcanvas.js" defer></script>
+  <script src="splash.js" defer></script>
+
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
