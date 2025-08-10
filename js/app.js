@@ -1,9 +1,7 @@
 import { LoginSystem } from './modules/LoginSystem.js';
-import { LoginHandler } from './modules/loginHandler.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   new LoginSystem();
-  new LoginHandler();
   
   // Check if app is running in standalone mode
   if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
@@ -19,3 +17,4 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
