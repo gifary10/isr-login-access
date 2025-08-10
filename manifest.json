@@ -2,7 +2,8 @@
   "name": "Integrated Safety Report",
   "short_name": "Safety Report",
   "description": "Login Access for Integrated Safety Report",
-  "start_url": "index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#303030",
@@ -70,4 +71,5 @@
   "launch_handler": {
     "client_mode": "focus-existing,auto"
   }
+
 }
