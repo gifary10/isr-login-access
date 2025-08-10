@@ -75,10 +75,126 @@ export class LoginHandler {
     return true;
   }
 
-  // ... (method-method lainnya tetap sama, hanya disesuaikan field username → user)
-  // validateEmail(), saveLoginData(), redirectToTarget(), showError(), dll
+    /**
+   * Menangani proses login dan penyimpanan data
+   * @param {Event} e - Event submit form
+   */
+  handleLogin(e) {
+    e.preventDefault();
+
+    const user = document.getElementById('user')?.value.trim();
+    const email = document.getElementById('email')?.value.trim();
+    const accessCode = document.getElementById('accessCode')?.value.trim();
+
+    if (!user || !email || !accessCode) {
+      this.showError('Harap isi semua field!');
+      return;
+    }
+
+    // Validasi format email
+    if (!this.validateEmail(email)) {
+      this.showError('Format email tidak valid');
+      return;
+    }
+
+    // Simpan data login
+    this.saveLoginData({
+      user,
+      email,
+      accessCode,
+      loginTime: Date.now()
+    });
+
+    // Redirect ke halaman tujuan
+    this.redirectToTarget();
+  }
+
+  /**
+   * Validasi format email
+   * @param {string} email - Email yang akan divalidasi
+   * @returns {boolean} - True jika email valid
+   */
+  validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+
+  /**
+   * Menyimpan data login ke localStorage
+   * @param {Object} data - Data login yang akan disimpan
+   */
+  saveLoginData(data) {
+    try {
+      localStorage.setItem(this.loginDataKey, JSON.stringify(data));
+      console.log('Login data saved successfully');
+    } catch (error) {
+      console.error('Error saving login data:', error);
+      this.showError('Gagal menyimpan data login');
+    }
+  }
+
+  /**
+   * Redirect ke halaman tujuan
+   */
+  redirectToTarget() {
+    window.location.href = this.targetPageUrl;
+  }
+
+  /**
+   * Redirect ke halaman login
+   */
+  redirectToLogin() {
+    window.location.href = this.loginPageUrl;
+  }
+
+  /**
+   * Menampilkan pesan error
+   * @param {string} message - Pesan error yang akan ditampilkan
+   */
+  showError(message) {
+    alert(message); // Bisa diganti dengan toast notification yang lebih baik
+  }
+
+  /**
+   * Mendapatkan data login yang tersimpan
+   * @returns {Object|null} - Data login atau null jika tidak ada
+   */
+  getSavedLoginData() {
+    try {
+      const data = localStorage.getItem(this.loginDataKey);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Error retrieving login data:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Membersihkan data login yang tersimpan
+   */
+  clearLoginData() {
+    localStorage.removeItem(this.loginDataKey);
+  }
+
+  /**
+   * Cek apakah user sudah login
+   * @returns {boolean} - True jika sudah login
+   */
+  isLoggedIn() {
+    const loginData = this.getSavedLoginData();
+    if (!loginData) return false;
+
+    const now = Date.now();
+    if (now - loginData.loginTime > this.sessionDuration) {
+      this.clearLoginData();
+      return false;
+    }
+
+    return true;
+  }
 }
 
+// Inisialisasi jika diperlukan
 document.addEventListener('DOMContentLoaded', () => {
   new LoginHandler();
 });
