@@ -278,29 +278,8 @@
       installContainer.style.display = 'none';
       deferredPrompt = null;
     });
-
-    document.getElementById('userSection').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const user = document.getElementById('user').value.trim();
-    const email = document.getElementById('email').value.trim();
-
-    if (user && email) {
-        const loginData = {
-            username: user,
-            email: email,
-            accessCode: Math.random().toString(36).substring(2), // random code
-            loginTime: Date.now()
-        };
-
-        localStorage.setItem('safetyReportLoginData', JSON.stringify(loginData));
-
-        // Redirect kembali ke halaman tujuan
-        window.location.href = 'https://gifary10.github.io/halaman-tujuan/';
-    }
-});
- 
   </script>
 </body>
 </html>
+
 
