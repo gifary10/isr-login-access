@@ -4,7 +4,7 @@
 export class LoginHandler {
   constructor() {
     this.loginDataKey = 'safetyReportLoginData';
-    this.redirectUrl = 'https://gifary10.github.io/halaman-tujuan/';
+    this.redirectUrl = 'https://gifary10.github.io/isr-e-45001-2018/';
     this.loginForm = document.getElementById('loginForm');
     this.init();
   }
@@ -113,4 +113,5 @@ export class LoginHandler {
 // Inisialisasi jika diperlukan
 document.addEventListener('DOMContentLoaded', () => {
   new LoginHandler();
+
 });
