@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#303030" />
+  <meta name="description" content="Login Access for Integrated Safety Report">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="Safety Report">
+  <meta name="apple-mobile-web-app-title" content="Safety Report">
+  <meta name="msapplication-starturl" content="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+  <link rel="icon" href="icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <title>Login Access | Integrated Safety Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="logop.png" as="image">
+  <link rel="preload" href="logoh.png" as="image">
+</head>
+<body class="min-vh-100 d-flex align-items-center justify-content-center p-3 bg-light">
+  <!-- Install Prompt -->
+  <div id="installContainer" class="position-fixed top-0 end-0 m-3" style="z-index: 1100; display: none;">
+  <button id="installBtn" class="btn btn-primary shadow-lg d-flex align-items-center justify-content-center">
+    <img src="1.png" alt="Install Icon" class="me-2" style="width:20px; height:20px; object-fit:contain;">
+    Install Aplikasi
+  </button>
+</div>
+
+  <!-- Toast Notification -->
+  <div id="toast"
+       class="position-fixed top-0 p-2"
+       style="z-index: 1101; display: none; top: 1rem; right: 1rem;">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 300px;">
+      <div class="toast-body d-flex align-items-center">
+        <span id="toast-icon" class="rounded me-2" aria-hidden="true"></span>
+        <span class="toast-message flex-grow-1"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card access-card shadow-lg">
+    <div class="card-header animated-header text-center py-4 position-relative">
+      <button id="menuBtn" class="btn btn-link position-absolute start-0 top-0 ms-1 mt-1 text-white" aria-label="Open menu">
+        <i class="material-icons">menu</i>
+      </button>
+      <img src="logop.png" alt="Logo" class="img-fluid mb-2" style="height: 56px;" loading="eager">
+      <!-- Loading Indicator - Moved to header -->
+      <div id="loadingIndicator" class="loading-indicator-header" style="display: none;" aria-live="polite">
+        <div class="loading-container">
+          <div class="outer-circle">
+            <img src="3.png" alt="Loading outer">
+          </div>
+          <div class="inner-circle">
+            <img src="2.png" alt="Loading inner">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator p-2 bg-light">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="step active" data-step="1" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">
+          <div class="step-number">1</div>
+          <div class="step-label">Verifikasi</div>
+        </div>
+        <div class="step-connector" aria-hidden="true"></div>
+        <div class="step" data-step="2" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">
+          <div class="step-number">2</div>
+          <div class="step-label">Produk</div>
+        </div>
+        <div class="step-connector" aria-hidden="true"></div>
+        <div class="step" data-step="3" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">
+          <div class="step-number">3</div>
+          <div class="step-label">Kode</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- User Section -->
+      <div id="userSection" class="section-content">
+        <form id="userForm" novalidate>
+          <div class="mb-3">
+            <label for="user" class="form-label">Nama User:</label>
+            <input type="text" class="form-control" id="user" placeholder="Masukkan nama" autocomplete="name" required>
+            <div class="invalid-feedback">Harap isi nama user</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="email" placeholder="Masukkan email" autocomplete="email" required>
+              <span class="input-group-text">@gmail.com</span>
+            </div>
+            <div class="invalid-feedback">Harap isi alamat email</div>
+          </div>
+
+          <div class="d-flex gap-3">
+            <button type="button" id="helpBtn" class="btn btn-outline-secondary flex-grow-1">
+              <i class="material-icons align-middle me-1">info</i>
+              Bantuan
+            </button>
+            <button type="submit" id="verifyBtn" class="btn btn-primary flex-grow-1">
+              Verifikasi
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Produk Section -->
+      <div id="produkSection" class="section-content" style="display: none;" aria-live="polite">
+        <form id="produkForm" novalidate>
+          <div class="mb-3">
+            <label for="produk" class="form-label">Pilih Produk:</label>
+            <select class="form-select" id="produk" required>
+              <option value="">-- Pilih Produk --</option>
+            </select>
+            <div class="invalid-feedback">Harap pilih produk</div>
+          </div>
+
+          <div class="d-flex gap-3">
+            <button type="button" id="backToUserBtn" class="btn btn-outline-secondary flex-grow-1">
+              <i class="material-icons align-middle me-1">arrow_back</i> 
+            </button>
+            <button type="submit" id="selectProdukBtn" class="btn btn-primary flex-grow-1">
+              Lanjut
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Kode Section -->
+      <div id="kodeSection" class="section-content" style="display: none;" aria-live="polite">
+        <div class="bg-light p-3 rounded mb-3">
+          <p class="mb-1"><span class="fw-bold">User:</span> <span id="displayUser"></span></p>
+          <p class="mb-1"><span class="fw-bold">Email:</span> <span id="displayEmail"></span></p>
+          <p class="mb-0"><span class="fw-bold">Produk:</span> <span id="displayProduk"></span></p>
+        </div>
+
+        <form id="kodeForm" novalidate>
+          <div class="mb-3">
+            <label for="kode" class="form-label">Kode Akses:</label>
+            <input type="text" class="form-control" id="kode" placeholder="Masukkan kode akses" autocomplete="one-time-code" required>
+            <div class="invalid-feedback">Harap masukkan kode akses</div>
+          </div>
+
+          <div class="d-flex gap-3">
+            <button type="button" id="backToProdukBtn" class="btn btn-outline-secondary flex-grow-1">
+              <i class="material-icons align-middle me-1">arrow_back</i>
+            </button>
+            <button type="submit" id="checkKodeBtn" class="btn btn-primary flex-grow-1">
+              Akses
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Panduan Login</h5>
+            <button type="button" id="closeHelpModal" class="btn-close" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Berikut panduan untuk login ke aplikasi:</p>
+            <ol class="ps-4">
+              <li class="mb-2">Anda dapat login jika sudah melakukan pembelian melalui link <strong>lynk.id/gifary10</strong></li>
+              <li class="mb-2">Username dan email harus diisi sesuai dengan isian pada saat pembelian di lynk.id</li>
+              <li>Kode akses akan dikirimkan melalui email setelah melakukan pembelian dari lynk.id beserta dengan informasi username, email, produk dan kode akses</li>
+            </ol>
+          </div>
+          <div class="modal-footer">
+            <button id="confirmHelpModal" class="btn btn-primary w-100">
+              Mengerti
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Offcanvas -->
+    <div id="offcanvasProducts" class="offcanvas offcanvas-end" tabindex="-1">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Daftar Produk</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <!-- Products will be loaded dynamically -->
+      </div>
+    </div>
+  </div>
+  
+  <footer class="fixed-bottom bg-tombol text-white text-center py-1">
+    <small>Integrated Safety Report ©2025</small>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+  
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful');
+            
+            // Track the installing worker
+            let installingWorker = registration.installing;
+            
+            registration.addEventListener('updatefound', () => {
+              installingWorker = registration.installing;
+              installingWorker.addEventListener('statechange', () => {
+                if (installingWorker.state === 'installed') {
+                  if (navigator.serviceWorker.controller) {
+                    // New update available
+                    console.log('New content available; please refresh.');
+                    // You could show a toast notification here to prompt user to refresh
+                  } else {
+                    // First install
+                    console.log('Content is cached for offline use.');
+                  }
+                }
+              });
+            });
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+
+    // Handle install prompt
+    let deferredPrompt;
+    const installContainer = document.getElementById('installContainer');
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      // Show the install button
+      installContainer.style.display = 'block';
+      
+      installBtn.addEventListener('click', () => {
+        // Hide the install button
+        installContainer.style.display = 'none';
+        // Show the install prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted install prompt');
+          } else {
+            console.log('User dismissed install prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('App was installed');
+      installContainer.style.display = 'none';
+      deferredPrompt = null;
+    });
+  </script>
+</body>
+</html>
