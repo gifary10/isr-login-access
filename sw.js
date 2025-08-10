@@ -1,6 +1,6 @@
 const CACHE_NAME = 'safety-report-v22';
 const ASSETS_TO_CACHE = [
-  '',
+  '/',
   'index.html',
   'css/style.css',
   'js/app.js',
@@ -94,3 +94,4 @@ self.addEventListener('message', (event) => {
   }
 
 });
+
