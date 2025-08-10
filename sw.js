@@ -1,4 +1,4 @@
-const CACHE_NAME = 'safety-report-v21';
+const CACHE_NAME = 'safety-report-v22';
 const ASSETS_TO_CACHE = [
   '',
   'index.html',
@@ -20,7 +20,8 @@ const ASSETS_TO_CACHE = [
   'icons/icon-192x192.png',
   'icons/icon-384x384.png',
   'icons/icon-512x512.png',
-  'manifest.json'
+  'manifest.json',
+  'https://gifary10.github.io/isr-e-45001-2018/'
 ];
 
 self.addEventListener('install', (event) => {
@@ -91,4 +92,5 @@ self.addEventListener('message', (event) => {
   if (event.data.action === 'skipWaiting') {
     self.skipWaiting();
   }
+
 });
