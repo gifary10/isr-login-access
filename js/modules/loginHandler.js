@@ -3,194 +3,132 @@
  */
 export class LoginHandler {
   constructor() {
-    this.loginDataKey = 'safetyReportLoginData';
-    this.loginPageUrl = 'https://gifary10.github.io/isr-login-access/';
-    this.targetPageUrl = 'https://gifary10.github.io/isr-e-45001-2018/';
-    this.sessionDuration = 8 * 60 * 60 * 1000; // 8 jam dalam milidetik
-    this.loginForm = document.getElementById('loginForm');
-    this.init();
+    this.initEventListeners();
   }
 
-  init() {
-    if (this.loginForm) {
-      this.loginForm.addEventListener('submit', (e) => this.handleLogin(e));
-    }
+  initEventListeners() {
+    // Handle form submissions for all three steps
+    document.getElementById('userForm')?.addEventListener('submit', (e) => this.handleUserForm(e));
+    document.getElementById('produkForm')?.addEventListener('submit', (e) => this.handleProdukForm(e));
+    document.getElementById('kodeForm')?.addEventListener('submit', (e) => this.handleKodeForm(e));
     
-    // Cek session saat inisialisasi
-    this.checkSession();
-  }
-
-  /**
-   * Menangani proses login dan penyimpanan data
-   * @param {Event} e - Event submit form
-   */
-  handleLogin(e) {
-    e.preventDefault();
-
-    const user = document.getElementById('user')?.value.trim(); // Diubah dari username → user
-    const email = document.getElementById('email')?.value.trim();
-    const accessCode = document.getElementById('accessCode')?.value.trim();
-
-    if (!user || !email || !accessCode) {
-      this.showError('Harap isi semua field!');
-      return;
-    }
-
-    if (!this.validateEmail(email)) {
-      this.showError('Format email tidak valid');
-      return;
-    }
-
-    // Simpan data login dengan field 'user' bukan 'username'
-    this.saveLoginData({
-      user, // Diubah dari username → user
-      email,
-      accessCode,
-      loginTime: Date.now()
+    // Back button handlers
+    document.getElementById('backToUserBtn')?.addEventListener('click', () => this.backToUser());
+    document.getElementById('backToProdukBtn')?.addEventListener('click', () => this.backToProduk());
+    
+    // Help modal handlers
+    document.getElementById('helpBtn')?.addEventListener('click', () => {
+      new bootstrap.Modal(document.getElementById('helpModal')).show();
     });
-
-    this.redirectToTarget();
-  }
-
-  /**
-   * Cek validitas session yang tersimpan
-   * @returns {boolean} - True jika session valid
-   */
-  checkSession() {
-    const loginData = this.getSavedLoginData();
-    if (!loginData) return false;
-
-    // Validasi field yang diperlukan (sesuai dengan LoginSystem.js)
-    if (!loginData.user || !loginData.email || !loginData.accessCode) { // Diubah dari username → user
-      this.clearLoginData();
-      return false;
-    }
-
-    const now = Date.now();
-    if (now - loginData.loginTime > this.sessionDuration) {
-      this.clearLoginData();
-      return false;
-    }
-
-    return true;
-  }
-
-    /**
-   * Menangani proses login dan penyimpanan data
-   * @param {Event} e - Event submit form
-   */
-  handleLogin(e) {
-    e.preventDefault();
-
-    const user = document.getElementById('user')?.value.trim();
-    const email = document.getElementById('email')?.value.trim();
-    const accessCode = document.getElementById('accessCode')?.value.trim();
-
-    if (!user || !email || !accessCode) {
-      this.showError('Harap isi semua field!');
-      return;
-    }
-
-    // Validasi format email
-    if (!this.validateEmail(email)) {
-      this.showError('Format email tidak valid');
-      return;
-    }
-
-    // Simpan data login
-    this.saveLoginData({
-      user,
-      email,
-      accessCode,
-      loginTime: Date.now()
+    
+    document.getElementById('confirmHelpModal')?.addEventListener('click', () => {
+      const helpModal = bootstrap.Modal.getInstance(document.getElementById('helpModal'));
+      helpModal.hide();
     });
-
-    // Redirect ke halaman tujuan
-    this.redirectToTarget();
   }
 
-  /**
-   * Validasi format email
-   * @param {string} email - Email yang akan divalidasi
-   * @returns {boolean} - True jika email valid
-   */
-  validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  }
-
-  /**
-   * Menyimpan data login ke localStorage
-   * @param {Object} data - Data login yang akan disimpan
-   */
-  saveLoginData(data) {
-    try {
-      localStorage.setItem(this.loginDataKey, JSON.stringify(data));
-      console.log('Login data saved successfully');
-    } catch (error) {
-      console.error('Error saving login data:', error);
-      this.showError('Gagal menyimpan data login');
+  handleUserForm(e) {
+    e.preventDefault();
+    
+    const user = document.getElementById('user').value.trim();
+    const email = document.getElementById('email').value.trim() + "@gmail.com";
+    
+    if (user && email) {
+      // Show loading indicator
+      document.getElementById('loadingIndicator').style.display = 'block';
+      
+      // Simulate verification process
+      setTimeout(() => {
+        // Hide loading indicator
+        document.getElementById('loadingIndicator').style.display = 'none';
+        
+        // Move to produk section
+        document.getElementById('userSection').style.display = 'none';
+        document.getElementById('produkSection').style.display = 'block';
+        
+        // Update step indicator
+        this.updateStepIndicator(2);
+        
+        // Store user data temporarily
+        sessionStorage.setItem('tempUser', user);
+        sessionStorage.setItem('tempEmail', email);
+      }, 1500);
     }
   }
 
-  /**
-   * Redirect ke halaman tujuan
-   */
-  redirectToTarget() {
-    window.location.href = this.targetPageUrl;
-  }
-
-  /**
-   * Redirect ke halaman login
-   */
-  redirectToLogin() {
-    window.location.href = this.loginPageUrl;
-  }
-
-  /**
-   * Menampilkan pesan error
-   * @param {string} message - Pesan error yang akan ditampilkan
-   */
-  showError(message) {
-    alert(message); // Bisa diganti dengan toast notification yang lebih baik
-  }
-
-  /**
-   * Mendapatkan data login yang tersimpan
-   * @returns {Object|null} - Data login atau null jika tidak ada
-   */
-  getSavedLoginData() {
-    try {
-      const data = localStorage.getItem(this.loginDataKey);
-      return data ? JSON.parse(data) : null;
-    } catch (error) {
-      console.error('Error retrieving login data:', error);
-      return null;
+  handleProdukForm(e) {
+    e.preventDefault();
+    
+    const produk = document.getElementById('produk').value;
+    
+    if (produk) {
+      // Move to kode section
+      document.getElementById('produkSection').style.display = 'none';
+      document.getElementById('kodeSection').style.display = 'block';
+      
+      // Update step indicator
+      this.updateStepIndicator(3);
+      
+      // Display user info
+      document.getElementById('displayUser').textContent = sessionStorage.getItem('tempUser');
+      document.getElementById('displayEmail').textContent = sessionStorage.getItem('tempEmail');
+      document.getElementById('displayProduk').textContent = produk;
+      
+      // Store produk temporarily
+      sessionStorage.setItem('tempProduk', produk);
     }
   }
 
-  /**
-   * Membersihkan data login yang tersimpan
-   */
-  clearLoginData() {
-    localStorage.removeItem(this.loginDataKey);
+  handleKodeForm(e) {
+    e.preventDefault();
+    
+    const kode = document.getElementById('kode').value.trim();
+    
+    if (kode) {
+      // Show loading indicator
+      document.getElementById('loadingIndicator').style.display = 'block';
+      
+      // Simulate verification process
+      setTimeout(() => {
+        // Create login data object
+        const loginData = {
+          user: sessionStorage.getItem('tempUser'),
+          email: sessionStorage.getItem('tempEmail'),
+          produk: sessionStorage.getItem('tempProduk'),
+          kode: kode,
+          loginTime: new Date().toISOString()
+        };
+        
+        // Store in localStorage
+        localStorage.setItem('safetyReportLoginData', JSON.stringify(loginData));
+        
+        // Redirect to destination
+        window.location.href = 'https://gifary10.github.io/isr-e-45001-2018/';
+      }, 1500);
+    }
   }
 
-  /**
-   * Cek apakah user sudah login
-   * @returns {boolean} - True jika sudah login
-   */
-  isLoggedIn() {
-    const loginData = this.getSavedLoginData();
-    if (!loginData) return false;
+  backToUser() {
+    document.getElementById('produkSection').style.display = 'none';
+    document.getElementById('userSection').style.display = 'block';
+    this.updateStepIndicator(1);
+  }
 
-    const now = Date.now();
-    if (now - loginData.loginTime > this.sessionDuration) {
-      this.clearLoginData();
-      return false;
-    }
+  backToProduk() {
+    document.getElementById('kodeSection').style.display = 'none';
+    document.getElementById('produkSection').style.display = 'block';
+    this.updateStepIndicator(2);
+  }
 
-    return true;
+  updateStepIndicator(activeStep) {
+    document.querySelectorAll('.step').forEach(step => {
+      const stepNumber = parseInt(step.dataset.step);
+      if (stepNumber === activeStep) {
+        step.classList.add('active');
+      } else {
+        step.classList.remove('active');
+      }
+    });
   }
 }
 
