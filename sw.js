@@ -1,26 +1,26 @@
 const CACHE_NAME = 'safety-report-v25';
 const ASSETS_TO_CACHE = [
-  '/',
-  'index.html',
-  'css/style.css',
-  'js/app.js',
-  'js/modules/LoginSystem.js',
-  'js/modules/helpers/fetch.js',
-  'js/modules/helpers/offcanvas.js',
-  'js/modules/helpers/splash.js',
-  '2.png',
-  '3.png',
-  'logoh.png',
-  'logop.png',
-  'icons/icon-72x72.png',
-  'icons/icon-96x96.png',
-  'icons/icon-128x128.png',
-  'icons/icon-144x144.png',
-  'icons/icon-152x152.png',
-  'icons/icon-192x192.png',
-  'icons/icon-384x384.png',
-  'icons/icon-512x512.png',
-  'manifest.json'
+  './',
+  './index.html',
+  './css/style.css',
+  './js/app.js',
+  './js/modules/LoginSystem.js',
+  './js/modules/helpers/fetch.js',
+  './js/modules/helpers/offcanvas.js',
+  './js/modules/helpers/splash.js',
+  './2.png',
+  './3.png',
+  './logoh.png',
+  './logop.png',
+  './icons/icon-72x72.png',
+  './icons/icon-96x96.png',
+  './icons/icon-128x128.png',
+  './icons/icon-144x144.png',
+  './icons/icon-152x152.png',
+  './icons/icon-192x192.png',
+  './icons/icon-384x384.png',
+  './icons/icon-512x512.png',
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -110,3 +110,4 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
