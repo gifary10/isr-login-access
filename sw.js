@@ -20,8 +20,7 @@ const ASSETS_TO_CACHE = [
   'icons/icon-192x192.png',
   'icons/icon-384x384.png',
   'icons/icon-512x512.png',
-  'manifest.json',
-  'https://gifary10.github.io/isr-e-45001-2018/'
+  'manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -94,5 +93,6 @@ self.addEventListener('message', (event) => {
   }
 
 });
+
 
 
