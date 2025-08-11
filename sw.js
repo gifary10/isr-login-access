@@ -1,4 +1,4 @@
-const CACHE_NAME = 'safety-report-v23';
+const CACHE_NAME = 'safety-report-v24';
 const ASSETS_TO_CACHE = [
   '/',
   'index.html',
@@ -27,7 +27,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(ASSETS_TO_CACHE);
+        // Use Promise.all with individual cache.add for better error handling
+        return Promise.all(
+          ASSETS_TO_CACHE.map((asset) => {
+            return cache.add(asset).catch((err) => {
+              console.warn(`Failed to cache ${asset}:`, err);
+            });
+          })
+        );
       })
       .then(() => self.skipWaiting())
   );
@@ -80,7 +87,7 @@ self.addEventListener('fetch', (event) => {
           .catch(() => {
             // If fetch fails, return offline page or fallback
             if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('./offline.html');
+              return caches.match('/');
             }
           });
       })
@@ -91,8 +98,4 @@ self.addEventListener('message', (event) => {
   if (event.data.action === 'skipWaiting') {
     self.skipWaiting();
   }
-
 });
-
-
-
