@@ -280,30 +280,37 @@
     });
 
      // auth
+
+
 document.getElementById('userForm').addEventListener('submit', function(e) {
   e.preventDefault();
 
   const user = document.getElementById('user').value.trim();
   const email = document.getElementById('email').value.trim();
   const params = new URLSearchParams(window.location.search);
-  const redirectUrl = params.get("redirect") || "https://gifary10.github.io/";
+  const redirectUrl = params.get("redirect"); // selalu dapat URL dari situs tujuan
+
+  if (!redirectUrl) {
+    alert("Tidak ada halaman tujuan.");
+    return;
+  }
 
   if (user && email) {
     const expiry = Date.now() + (8 * 60 * 60 * 1000); // 8 jam
     const tokenData = { user, email, expiry };
     const token = btoa(JSON.stringify(tokenData));
 
-    // Redirect ke situs tujuan dengan token
+    // Redirect balik ke situs tujuan
     window.location.href = `${redirectUrl}?auth=${encodeURIComponent(token)}`;
   } else {
     alert("Nama dan email harus diisi!");
   }
 });
 
-
   </script>
 </body>
 </html>
+
 
 
 
