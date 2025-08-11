@@ -23,7 +23,7 @@ body {
 
 .access-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 360px;
   border: none;
   overflow: hidden;
 }
@@ -102,7 +102,7 @@ body {
 /* Buttons */
 .btn-primary {
   background-color: var(--tombol);
-  border-color: var(--tombol);
+  border-color: var(--success);
   transition: var(--transition-base);
 }
 
@@ -315,16 +315,60 @@ footer small {
   opacity: 1;
 }
 
-/* Install button styles */
+/* Install prompt styles */
 #installContainer {
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 1rem;
+  right: 1rem;
   animation: slideDown 0.5s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+#installContainer .card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#installContainer .card-body {
+  padding: 1.25rem;
+}
+
+#installContainer .card-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+#installContainer .card-text {
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+}
+
+#installContainer ul {
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+#installContainer ul li {
+  margin-bottom: 0.25rem;
+}
+
+#installBtn {
+  animation: pulse 2s infinite;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+#dismissInstallBtn {
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
 }
 
 @keyframes slideDown {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-20px);
     opacity: 0;
   }
   to {
@@ -333,14 +377,16 @@ footer small {
   }
 }
 
-#installBtn {
-  animation: pulse 2s infinite;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  font-weight: 500;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(48, 48, 48, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(48, 48, 48, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(48, 48, 48, 0);
+  }
 }
 
 /* PWA specific styles */
