@@ -1,4 +1,4 @@
-const CACHE_NAME = 'safety-report-v24';
+const CACHE_NAME = 'safety-report-v25';
 const ASSETS_TO_CACHE = [
   '/',
   'index.html',
@@ -27,14 +27,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        // Use Promise.all with individual cache.add for better error handling
-        return Promise.all(
-          ASSETS_TO_CACHE.map((asset) => {
-            return cache.add(asset).catch((err) => {
-              console.warn(`Failed to cache ${asset}:`, err);
-            });
-          })
-        );
+        return cache.addAll(ASSETS_TO_CACHE)
+          .catch(err => {
+            console.error('Failed to cache some assets:', err);
+          });
       })
       .then(() => self.skipWaiting())
   );
@@ -57,38 +53,47 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   
+  // Network-first strategy for API calls
+  if (event.request.url.includes('script.google.com')) {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          return new Response(JSON.stringify({error: "Offline mode not supported for this feature"}), {
+            headers: {'Content-Type': 'application/json'}
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache-first strategy for assets
   event.respondWith(
     caches.match(event.request)
-      .then((response) => {
-        // Return cached response if found
-        if (response) {
-          return response;
-        }
-
-        // Otherwise fetch from network
-        return fetch(event.request)
+      .then((cachedResponse) => {
+        return cachedResponse || fetch(event.request)
           .then((response) => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+            // Don't cache API responses
+            if (!event.request.url.includes('script.google.com') && 
+                response.status === 200 && 
+                response.type === 'basic') {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => cache.put(event.request, responseToCache));
             }
-
-            // Clone the response
-            const responseToCache = response.clone();
-
-            // Cache the new response
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
             return response;
           })
           .catch(() => {
-            // If fetch fails, return offline page or fallback
+            // Offline fallback
             if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('/');
+              return caches.match('index.html');
             }
+            return new Response('Offline', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: new Headers({
+                'Content-Type': 'text/plain'
+              })
+            });
           });
       })
   );
