@@ -51,6 +51,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Skip unsupported schemes
+  if (!['http', 'https'].includes(new URL(event.request.url).protocol.replace(':', ''))) {
+    return;
+  }
+
   if (event.request.method !== 'GET') return;
   
   // Network-first strategy for API calls
@@ -78,7 +83,8 @@ self.addEventListener('fetch', (event) => {
                 response.type === 'basic') {
               const responseToCache = response.clone();
               caches.open(CACHE_NAME)
-                .then(cache => cache.put(event.request, responseToCache));
+                .then(cache => cache.put(event.request, responseToCache))
+                .catch(err => console.error('Failed to cache response:', err));
             }
             return response;
           })
