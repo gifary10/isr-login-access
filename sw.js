@@ -1,7 +1,7 @@
-const CACHE_NAME = 'safety-report-v25';
+const CACHE_NAME = 'safety-report-v26';
+const API_CACHE_NAME = 'safety-report-api-v1';
 const ASSETS_TO_CACHE = [
   './',
-  './index.html',
   './css/style.css',
   './js/app.js',
   './js/modules/LoginSystem.js',
@@ -41,7 +41,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
+          if (cache !== CACHE_NAME && cache !== API_CACHE_NAME) {
             return caches.delete(cache);
           }
         })
@@ -51,36 +51,87 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
   // Skip unsupported schemes
-  if (!['http', 'https'].includes(new URL(event.request.url).protocol.replace(':', ''))) {
+  if (!['http', 'https'].includes(url.protocol.replace(':', ''))) {
     return;
   }
 
   if (event.request.method !== 'GET') return;
   
-  // Network-first strategy for API calls
-  if (event.request.url.includes('script.google.com')) {
+  // Network-first strategy for HTML documents
+  if (event.request.headers.get('accept').includes('text/html')) {
     event.respondWith(
       fetch(event.request)
+        .then((response) => {
+          // Update cache with fresh response
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(event.request, responseToCache))
+            .catch(err => console.error('Failed to cache HTML:', err));
+          return response;
+        })
         .catch(() => {
-          return new Response(JSON.stringify({error: "Offline mode not supported for this feature"}), {
-            headers: {'Content-Type': 'application/json'}
-          });
+          return caches.match(event.request) || caches.match('index.html');
         })
     );
     return;
   }
 
-  // Cache-first strategy for assets
+  // Network-first strategy for API calls
+  if (url.href.includes('script.google.com')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Cache API responses for offline use
+          const responseToCache = response.clone();
+          caches.open(API_CACHE_NAME)
+            .then(cache => cache.put(event.request, responseToCache))
+            .catch(err => console.error('Failed to cache API response:', err));
+          return response;
+        })
+        .catch(() => {
+          // Try to serve from cache if offline
+          return caches.match(event.request)
+            .then(cachedResponse => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              return new Response(JSON.stringify({
+                error: "Offline mode",
+                message: "You're offline. Some features may not be available."
+              }), {
+                headers: {'Content-Type': 'application/json'}
+              });
+            });
+        })
+    );
+    return;
+  }
+
+  // Cache-first strategy for other assets
   event.respondWith(
     caches.match(event.request)
       .then((cachedResponse) => {
-        return cachedResponse || fetch(event.request)
-          .then((response) => {
-            // Don't cache API responses
-            if (!event.request.url.includes('script.google.com') && 
-                response.status === 200 && 
-                response.type === 'basic') {
+        // Return cached response if available
+        if (cachedResponse) {
+          // Update cache in the background
+          fetch(event.request)
+            .then(response => {
+              caches.open(CACHE_NAME)
+                .then(cache => cache.put(event.request, response))
+                .catch(err => console.error('Background cache update failed:', err));
+            })
+            .catch(err => console.error('Background fetch failed:', err));
+          return cachedResponse;
+        }
+        
+        // Otherwise fetch from network
+        return fetch(event.request)
+          .then(response => {
+            // Cache the response if valid
+            if (response.status === 200 && response.type === 'basic') {
               const responseToCache = response.clone();
               caches.open(CACHE_NAME)
                 .then(cache => cache.put(event.request, responseToCache))
@@ -89,10 +140,7 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // Offline fallback
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('index.html');
-            }
+            // Generic offline fallback
             return new Response('Offline', {
               status: 503,
               statusText: 'Service Unavailable',
@@ -110,4 +158,3 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-
