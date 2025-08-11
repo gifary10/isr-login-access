@@ -70,6 +70,30 @@ export class LoginSystem {
     setupOffcanvas(this.PRODUCTS);
     this.initEventListeners();
     this.updateStepIndicator(1);
+    
+    // Check for cached session
+    this.checkCachedSession();
+  }
+
+  checkCachedSession() {
+    const cachedUser = sessionStorage.getItem('authUser');
+    const cachedEmail = sessionStorage.getItem('authEmail');
+    const cachedProduk = sessionStorage.getItem('authProduk');
+    
+    if (cachedUser && cachedEmail) {
+      this.currentSession.user = cachedUser;
+      this.currentSession.email = cachedEmail;
+      this.DOM.inputs.user.value = cachedUser;
+      this.DOM.inputs.email.value = cachedEmail.replace('@gmail.com', '');
+      
+      if (cachedProduk) {
+        this.currentSession.produk = cachedProduk;
+        this.showSection("kode");
+        this.updateUserDisplay();
+      } else {
+        this.showSection("produk");
+      }
+    }
   }
 
   updateStepIndicator(currentStep) {
@@ -161,6 +185,10 @@ export class LoginSystem {
       });
 
       if (data.status === "success") {
+        // Cache the user data
+        sessionStorage.setItem('authUser', this.currentSession.user);
+        sessionStorage.setItem('authEmail', this.currentSession.email);
+        
         this.DOM.inputs.produk.innerHTML = data.produk?.map(p => 
           `<option value="${p}">${p}</option>`
         ).join('') || '';
@@ -186,61 +214,54 @@ export class LoginSystem {
     }
 
     this.currentSession.produk = this.DOM.inputs.produk.value;
+    sessionStorage.setItem('authProduk', this.currentSession.produk);
     this.updateUserDisplay();
     this.showSection("kode");
     this.DOM.forms.produk.classList.remove('was-validated');
   }
 
   async checkKode(e) {
-  if (e) e.preventDefault();
-  
-  if (!this.DOM.forms.kode.checkValidity()) {
-    this.DOM.forms.kode.classList.add('was-validated');
-    return;
-  }
-
-  const kode = this.DOM.inputs.kode.value.trim();
-  
-  try {
-    this.showLoading(true);
-    const data = await this.makeRequest({
-      action: "checkCode",
-      user: this.currentSession.user,
-      email: this.currentSession.email,
-      produk: this.currentSession.produk,
-      kode: kode
-    });
-
-    if (data.status === "success") {
-      // Simpan token di sessionStorage
-      sessionStorage.setItem('authToken', data.token);
-      sessionStorage.setItem('authUser', this.currentSession.user);
-      sessionStorage.setItem('authEmail', this.currentSession.email);
-      sessionStorage.setItem('authProduk', this.currentSession.produk);
-      
-      this.showToast('success', 'Akses berhasil! Mengarahkan...');
-      
-      setTimeout(() => {
-        if (data.link) {
-          // Tambahkan token sebagai parameter URL
-          const url = new URL(data.link);
-          url.searchParams.append('token', data.token);
-          url.searchParams.append('user', this.currentSession.user);
-          url.searchParams.append('email', this.currentSession.email);
-          url.searchParams.append('produk', this.currentSession.produk);
-          window.location.href = url.toString();
-        }
-      }, 1500);
-    } else {
-      this.showToast('error', 'Kode akses salah!');
+    if (e) e.preventDefault();
+    
+    if (!this.DOM.forms.kode.checkValidity()) {
+      this.DOM.forms.kode.classList.add('was-validated');
+      return;
     }
-  } catch (error) {
-    console.error('Error in checkKode:', error);
-    this.showToast('error', 'Terjadi kesalahan saat memverifikasi kode');
-  } finally {
-    this.showLoading(false);
+
+    const kode = this.DOM.inputs.kode.value.trim();
+    
+    try {
+      this.showLoading(true);
+      const data = await this.makeRequest({
+        action: "checkCode",
+        user: this.currentSession.user,
+        email: this.currentSession.email,
+        produk: this.currentSession.produk,
+        kode: kode
+      });
+
+      if (data.status === "success") {
+        // Simpan token di sessionStorage saja (tidak di URL)
+        sessionStorage.setItem('authToken', data.token);
+        
+        this.showToast('success', 'Akses berhasil! Mengarahkan...');
+        
+        setTimeout(() => {
+          if (data.link) {
+            // Redirect tanpa menyertakan token di URL
+            window.location.href = data.link;
+          }
+        }, 1500);
+      } else {
+        this.showToast('error', 'Kode akses salah!');
+      }
+    } catch (error) {
+      console.error('Error in checkKode:', error);
+      this.showToast('error', 'Terjadi kesalahan saat memverifikasi kode');
+    } finally {
+      this.showLoading(false);
+    }
   }
-}
 
   backToUser() {
     this.showSection("user");
@@ -270,18 +291,6 @@ export class LoginSystem {
     
     this.DOM.buttons.menuBtn?.addEventListener('click', () => {
       this.DOM.modals.offcanvas.show();
-    });
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.target.matches('textarea, [type="textarea"]')) {
-        if (this.DOM.sections.user.style.display !== 'none') {
-          this.verifyUser();
-        } else if (this.DOM.sections.produk.style.display !== 'none') {
-          this.selectProduk();
-        } else if (this.DOM.sections.kode.style.display !== 'none') {
-          this.checkKode();
-        }
-      }
     });
     
     Object.values(this.DOM.inputs).forEach(input => {
