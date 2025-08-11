@@ -17,24 +17,49 @@ export function setupSplashScreen() {
   
   const progressBar = splashScreen.querySelector('.progress-bar');
   let progress = 0;
+  
+  // Fungsi untuk menghitung kecepatan progress (lebih cepat di akhir)
+  const getProgressIncrement = (currentProgress) => {
+    if (currentProgress < 70) return 0.5; // Lambat di awal
+    if (currentProgress < 90) return 1;   // Sedang di tengah
+    return 2;                            // Cepat di akhir
+  };
+
   const progressInterval = setInterval(() => {
-    progress += 1;
-    progressBar.style.width = `${progress}%`;
-    if (progress >= 100) clearInterval(progressInterval);
+    progress += getProgressIncrement(progress);
+    progressBar.style.width = `${Math.min(progress, 100)}%`;
+    
+    if (progress >= 100) {
+      clearInterval(progressInterval);
+      // Mulai animasi fade out setelah progress selesai
+      setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        // Hapus element setelah transisi selesai
+        setTimeout(() => splashScreen.remove(), 500);
+      }, 300);
+    }
   }, 30);
 
   window.addEventListener('load', () => {
-  // Hentikan progress bar di 90% saat load event
-  clearInterval(progressInterval);
-  progressBar.style.width = '90%';
-  
-  // Animasi selesai ke 100% sebelum menghilang
-  setTimeout(() => {
-    progressBar.style.width = '100%';
-    setTimeout(() => {
-      splashScreen.style.opacity = '0';
-      setTimeout(() => splashScreen.remove(), 500);
-    }, 300);
-  }, 700);
-});
+    // Jika halaman selesai load sebelum progress 90%, percepat ke 90%
+    if (progress < 100) {
+      clearInterval(progressInterval);
+      progress = 100;
+      progressBar.style.width = '100%';
+      
+      // Lanjutkan animasi ke 100% dengan kecepatan normal
+      const finishInterval = setInterval(() => {
+        progress += 1;
+        progressBar.style.width = `${progress}%`;
+        
+        if (progress >= 100) {
+          clearInterval(finishInterval);
+          setTimeout(() => {
+            splashScreen.style.opacity = '0';
+            setTimeout(() => splashScreen.remove(), 5000);
+          }, 300);
+        }
+      }, 30);
+    }
+  });
 }
