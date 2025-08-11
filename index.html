@@ -243,49 +243,45 @@
       });
     }
 
-    // Replace the existing install prompt code with this:
-let deferredPrompt;
-const installContainer = document.getElementById('installContainer');
-const installBtn = document.getElementById('installBtn');
+    // Handle install prompt
+    let deferredPrompt;
+    const installContainer = document.getElementById('installContainer');
+    const installBtn = document.getElementById('installBtn');
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevent the mini-infobar from appearing on mobile
-  e.preventDefault();
-  // Stash the event so it can be triggered later
-  deferredPrompt = e;
-  // Show the install button
-  installContainer.style.display = 'block';
-  
-  // Remove any previous event listeners to avoid duplicates
-  installBtn.replaceWith(installBtn.cloneNode(true));
-  const newInstallBtn = document.getElementById('installBtn');
-  
-  newInstallBtn.addEventListener('click', async () => {
-    // Hide the install button
-    installContainer.style.display = 'none';
-    // Show the install prompt
-    deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('User accepted install prompt');
-    } else {
-      console.log('User dismissed install prompt');
-      // Show the button again if user dismissed
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      // Show the install button
       installContainer.style.display = 'block';
-    }
-    deferredPrompt = null;
-  });
-});
+      
+      installBtn.addEventListener('click', () => {
+        // Hide the install button
+        installContainer.style.display = 'none';
+        // Show the install prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted install prompt');
+          } else {
+            console.log('User dismissed install prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
 
-window.addEventListener('appinstalled', () => {
-  console.log('App was installed');
-  installContainer.style.display = 'none';
-  deferredPrompt = null;
-});
+    window.addEventListener('appinstalled', () => {
+      console.log('App was installed');
+      installContainer.style.display = 'none';
+      deferredPrompt = null;
+    });
   </script>
 </body>
 </html>
+
 
 
 
