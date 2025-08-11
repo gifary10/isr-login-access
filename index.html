@@ -282,34 +282,47 @@
      // auth
 
 
-document.getElementById('userForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const user = document.getElementById('user').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const params = new URLSearchParams(window.location.search);
-  const redirectUrl = params.get("redirect"); // selalu dapat URL dari situs tujuan
-
-  if (!redirectUrl) {
-    alert("Tidak ada halaman tujuan.");
-    return;
-  }
-
-  if (user && email) {
-    const expiry = Date.now() + (8 * 60 * 60 * 1000); // 8 jam
-    const tokenData = { user, email, expiry };
-    const token = btoa(JSON.stringify(tokenData));
-
-    // Redirect balik ke situs tujuan
-    window.location.href = `${redirectUrl}?auth=${encodeURIComponent(token)}`;
-  } else {
-    alert("Nama dan email harus diisi!");
-  }
+document.getElementById('kodeForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const kode = document.getElementById('kode').value.trim();
+    
+    if (kode) {
+        document.getElementById('loadingIndicator').style.display = 'block';
+        
+        try {
+            // Ganti URL_API dengan endpoint Anda
+            const response = await fetch('URL_API', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user: sessionStorage.getItem('tempUser'),
+                    email: sessionStorage.getItem('tempEmail'),
+                    produk: sessionStorage.getItem('tempProduk'),
+                    kode: kode
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                localStorage.setItem('safetyReportLoginData', JSON.stringify(data.loginData));
+                window.location.href = data.redirectUrl; // Link dari backend
+            } else {
+                alert("Kode tidak valid: " + data.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Terjadi kesalahan saat memverifikasi kode.");
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    }
 });
-
   </script>
 </body>
 </html>
+
 
 
 
