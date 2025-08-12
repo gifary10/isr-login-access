@@ -1,4 +1,4 @@
-const scriptUrl = "https://script.google.com/macros/s/AKfycbyqYUZwWgD2hqLf12tdrcwoJtNl8EPGej1RgrFXJtlP5Z_GshzRqNOfVufROGcEJ1bvSA/exec";
+const scriptUrl = "https://script.google.com/macros/s/AKfycbz1NUWREhzzRaEiU50CDzx5i9ksu_cJQYoHDgnsGfyOWrXv8Bwp853i4GhZZezDD5OcXg/exec";
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
 export async function makeRequest(params) {
@@ -49,3 +49,4 @@ export async function makeRequest(params) {
     this.showLoading(false);
   }
 }
+
