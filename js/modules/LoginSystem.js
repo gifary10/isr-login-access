@@ -168,8 +168,8 @@ export class LoginSystem {
       return;
     }
 
-    this.currentSession.user = this.DOM.inputs.user.value.trim();
-    let emailInput = this.DOM.inputs.email.value.trim();
+    this.currentSession.user = this.DOM.inputs.user.value.trim().toLowerCase();
+    let emailInput = this.DOM.inputs.email.value.trim().toLowerCase();
     
     if (emailInput && !emailInput.endsWith('@gmail.com')) {
       emailInput += '@gmail.com';
@@ -178,11 +178,17 @@ export class LoginSystem {
 
     try {
       this.showLoading(true);
-      const data = await this.makeRequest({
-        action: "verify",
-        user: this.currentSession.user,
-        email: this.currentSession.email
+      const response = await fetch('https://script.google.com/macros/s/AKfycbz1NUWREhzzRaEiU50CDzx5i9ksu_cJQYoHDgnsGfyOWrXv8Bwp853i4GhZZezDD5OcXg/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          action: 'verify',
+          user: this.currentSession.user,
+          email: this.currentSession.email
+        })
       });
+
+      const data = await response.json();
 
       if (data.status === "success") {
         // Cache the user data
@@ -232,24 +238,34 @@ export class LoginSystem {
     
     try {
       this.showLoading(true);
-      const data = await this.makeRequest({
-        action: "checkCode",
-        user: this.currentSession.user,
-        email: this.currentSession.email,
-        produk: this.currentSession.produk,
-        kode: kode
+      const response = await fetch('https://script.google.com/macros/s/AKfycbz1NUWREhzzRaEiU50CDzx5i9ksu_cJQYoHDgnsGfyOWrXv8Bwp853i4GhZZezDD5OcXg/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          action: 'checkCode',
+          user: this.currentSession.user,
+          email: this.currentSession.email,
+          produk: this.currentSession.produk,
+          kode: kode
+        })
       });
 
+      const data = await response.json();
+
       if (data.status === "success") {
-        // Simpan token di sessionStorage saja (tidak di URL)
+        // Save all auth data to sessionStorage
         sessionStorage.setItem('authToken', data.token);
+        sessionStorage.setItem('authUser', this.currentSession.user);
+        sessionStorage.setItem('authEmail', this.currentSession.email);
+        sessionStorage.setItem('authProduk', this.currentSession.produk);
         
         this.showToast('success', 'Akses berhasil! Mengarahkan...');
         
         setTimeout(() => {
-          if (data.link) {
-            // Redirect tanpa menyertakan token di URL
-            window.location.href = data.link;
+          // Check for redirect URL in sessionStorage first
+          const redirectUrl = sessionStorage.getItem('redirectUrl') || data.link;
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
           }
         }, 1500);
       } else {
