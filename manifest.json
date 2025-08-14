@@ -1,12 +1,13 @@
 {
-  "name": "Login Access",
-  "short_name": "LoginAccess",
-  "description": "User verification and login access system",
-  "start_url": "/",
+  "name": "Integrated Safety Report",
+  "short_name": "Safety Report",
+  "description": "Login Access for Integrated Safety Report",
+  "start_url": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#444444",
-  "orientation": "portrait",
+  "categories": ["business", "productivity", "security"],
   "scope": "/",
   "icons": [
     {
