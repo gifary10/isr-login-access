@@ -4,94 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi User</title>
-    <meta name="theme-color" content="#1a1a1a" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="theme-color" content="#444444" />
+    <link rel="manifest" href="/manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="styles/main.css" rel="stylesheet">
+    
 </head>
 <body>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            
-            <div class="card">
-    <div class="card-header d-flex align-items-center">
-        <img src="logop.png" alt="Logo" class="card-logo me-2">
-        <h2 class="h5 mb-0">Login Access</h2>
-    </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <img src="logop.png" alt="Logo" class="card-logo me-2">
+                        <h2 class="h5 mb-0">Login Access</h2>
+                    </div>
    
-                <div class="card-body position-relative">
-
-                    <!-- Spinner Overlay Step 1 -->
-                    <div id="loadingOverlay">
-                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-                        <span>Memeriksa data...</span>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="progress">
-                        <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 33%;" aria-valuenow="1" aria-valuemin="0" aria-valuemax="3">
-                            Step 1 dari 3
-                        </div>
-                    </div>
-
-                    <!-- Step 1 -->
-                    <div id="section1" class="step-section fade-scale-in">
-                        <h5 class="icon-text"><span class="material-icons" style="color: #4a6baf;">how_to_reg</span> Verifikasi User</h5>
-                        <input type="text" class="form-control" id="inputUser" placeholder="Masukkan nama user" required>
-                        <div id="userFeedback" class="invalid-feedback">Nama user harus diisi</div>
-                        <input type="email" class="form-control" id="inputEmail" placeholder="Masukkan email" required>
-                        <div id="emailFeedback" class="invalid-feedback">Email harus valid dan diisi</div>
-                        <button id="btnVerify" class="btn btn-primary w-100 icon-text position-relative overflow-hidden">
-                            <span class="material-icons">check_circle</span> Verifikasi
-                        </button>
-                        <div id="verifyResult" class="result-message"></div>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div id="section2" class="step-section" style="display:none;">
-                        <h5 class="icon-text"><span class="material-icons" style="color:#2b8a3e;">shopping_cart</span> Pilih Produk</h5>
-                        <select id="selectProduk" class="form-select" required>
-                            <option value="" disabled selected>Pilih produk Anda</option>
-                        </select>
-                        <div class="d-flex justify-content-between">
-                            <button id="btnBackStep2" class="btn btn-secondary icon-text position-relative overflow-hidden">
-                                <span class="material-icons">arrow_back</span> Kembali
-                            </button>
-                            <button id="btnNextStep2" class="btn btn-primary icon-text position-relative overflow-hidden">
-                                <span class="material-icons">arrow_forward</span> Lanjut
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div id="section3" class="step-section" style="display:none; position: relative;">
-                        <!-- Spinner Overlay Step 3 -->
-                        <div id="loadingOverlayStep3">
+                    <div class="card-body position-relative">
+                        <!-- Spinner Overlay Step 1 -->
+                        <div id="loadingOverlay">
                             <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-                            <span>Memproses...</span>
+                            <span>Memeriksa data...</span>
                         </div>
-                        <h5 class="icon-text"><span class="material-icons" style="color:#e67700;">vpn_key</span> Masukkan Kode Akses</h5>
-                        <input type="text" class="form-control" id="inputKode" placeholder="Masukkan kode akses" required>
-                        <div id="kodeFeedback" class="invalid-feedback">Kode akses harus diisi</div>
-                        <div class="d-flex justify-content-between">
-                            <button id="btnBackStep3" class="btn btn-secondary icon-text position-relative overflow-hidden">
-                                <span class="material-icons">arrow_back</span> Kembali
-                            </button>
-                            <button id="btnSubmitKode" class="btn btn-primary icon-text position-relative overflow-hidden">
-                                <span class="material-icons">send</span> Submit
-                            </button>
-                        </div>
-                        <div id="kodeResult" class="result-message"></div>
-                    </div>
 
+                        <!-- Progress Bar -->
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 33%;" aria-valuenow="1" aria-valuemin="0" aria-valuemax="3">
+                                Step 1 dari 3
+                            </div>
+                        </div>
+
+                        <!-- Step 1 -->
+                        <div id="section1" class="step-section fade-scale-in">
+                            <h5 class="icon-text"><span class="material-icons" style="color: #4a6baf;">how_to_reg</span> Verifikasi User</h5>
+                            <input type="text" class="form-control" id="inputUser" placeholder="Masukkan nama user" required>
+                            <div id="userFeedback" class="invalid-feedback">Nama user harus diisi</div>
+                            <input type="email" class="form-control" id="inputEmail" placeholder="Masukkan email" required>
+                            <div id="emailFeedback" class="invalid-feedback">Email harus valid dan diisi</div>
+                            <button id="btnVerify" class="btn btn-primary w-100 icon-text position-relative overflow-hidden">
+                                <span class="material-icons">check_circle</span> Verifikasi
+                            </button>
+                            <div id="verifyResult" class="result-message"></div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div id="section2" class="step-section" style="display:none;">
+                            <h5 class="icon-text"><span class="material-icons" style="color:#2b8a3e;">shopping_cart</span> Pilih Produk</h5>
+                            <div class="user-info mb-3">
+                                <div class="info-item"><strong>User:</strong> <span id="displayUser"></span></div>
+                                <div class="info-item"><strong>Email:</strong> <span id="displayEmail"></span></div>
+                            </div>
+                            <select id="selectProduk" class="form-select" required>
+                                <option value="" disabled selected>Pilih produk Anda</option>
+                            </select>
+                            <div class="d-flex justify-content-between">
+                                <button id="btnBackStep2" class="btn btn-secondary icon-text position-relative overflow-hidden">
+                                    <span class="material-icons">arrow_back</span> Kembali
+                                </button>
+                                <button id="btnNextStep2" class="btn btn-primary icon-text position-relative overflow-hidden">
+                                    <span class="material-icons">arrow_forward</span> Lanjut
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div id="section3" class="step-section" style="display:none; position: relative;">
+                            <!-- Spinner Overlay Step 3 -->
+                            <div id="loadingOverlayStep3">
+                                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+                                <span>Memproses...</span>
+                            </div>
+                            <h5 class="icon-text"><span class="material-icons" style="color:#e67700;">vpn_key</span> Masukkan Kode Akses</h5>
+                            <div class="user-info mb-3">
+                                <div class="info-item"><strong>User:</strong> <span id="displayUserStep3"></span></div>
+                                <div class="info-item"><strong>Email:</strong> <span id="displayEmailStep3"></span></div>
+                                <div class="info-item"><strong>Produk:</strong> <span id="displayProduk"></span></div>
+                            </div>
+                            <input type="text" class="form-control" id="inputKode" placeholder="Masukkan kode akses" required>
+                            <div id="kodeFeedback" class="invalid-feedback">Kode akses harus diisi</div>
+                            <div class="d-flex justify-content-between">
+                                <button id="btnBackStep3" class="btn btn-secondary icon-text position-relative overflow-hidden">
+                                    <span class="material-icons">arrow_back</span> Kembali
+                                </button>
+                                <button id="btnSubmitKode" class="btn btn-primary icon-text position-relative overflow-hidden">
+                                    <span class="material-icons">send</span> Login
+                                </button>
+                            </div>
+                            <div id="kodeResult" class="result-message"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script type="module" src="js/main.js"></script>
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Add beforeinstallprompt event handler
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            
+            // Show install button (you can add this to your UI)
+            const installButton = document.createElement('button');
+            installButton.textContent = 'Install App';
+            installButton.className = 'btn btn-secondary position-fixed';
+            installButton.style.bottom = '20px';
+            installButton.style.right = '20px';
+            installButton.style.zIndex = '1000';
+            installButton.addEventListener('click', () => {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+            document.body.appendChild(installButton);
+        });
+    </script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
