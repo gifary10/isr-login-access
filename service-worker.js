@@ -1,9 +1,14 @@
-const CACHE_NAME = 'login-access-v1';
+const CACHE_NAME = 'login-access-v2';
 const PRECACHE_ASSETS = [
-  './',
-  './index.html',
-  './styles/main.css',
-  './offline.html'
+  '/',
+  '/index.html',
+  '/styles/main.css',
+  '/offline.html',
+  '/manifest.json',
+  '/js/main.js',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/logop.png'
 ];
 
 const CDN_ASSETS = [
@@ -46,53 +51,23 @@ self.addEventListener('activate', event => {
 // Fetch event
 self.addEventListener('fetch', event => {
   const request = event.request;
-  const API_URL = '/api/data.json';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxmmdgHsgikOoJ_H5ppkFLSKIZfwmgQbcl2xMjon3naP-c-Oqf8t-q2X80tuvtYM-MF5w/exec';
 
   if (request.url.includes(API_URL)) {
-    // Stale-While-Revalidate untuk API
+    // Network first for API
     event.respondWith(
-      caches.open(CACHE_NAME).then(async cache => {
-        try {
-          const networkResponse = await fetch(request);
-          cache.put(request, networkResponse.clone());
-          return networkResponse;
-        } catch {
-          const cachedResponse = await cache.match(request);
-          return cachedResponse || new Response(JSON.stringify({ error: 'Offline' }), {
-            headers: { 'Content-Type': 'application/json' }
-          });
-        }
-      })
-    );
-  } else if (
-    request.url.endsWith('.js') ||
-    request.url.endsWith('.png') ||
-    request.url.endsWith('.jpg') ||
-    request.url.endsWith('.svg')
-  ) {
-    // Runtime caching untuk JS dan gambar/logo
-    event.respondWith(
-      caches.match(request).then(cached => {
-        if (cached) return cached;
-        return fetch(request).then(networkResponse => {
-          return caches.open(CACHE_NAME).then(cache => {
-            cache.put(request, networkResponse.clone());
-            return networkResponse;
-          });
-        }).catch(() => {
-          // fallback untuk gambar/logo bisa dikustom, misal image placeholder
-          if (request.destination === 'image') {
-            return new Response('', { status: 404 });
-          }
+      fetch(request).catch(() => {
+        return new Response(JSON.stringify({ error: 'Offline' }), {
+          headers: { 'Content-Type': 'application/json' }
         });
       })
     );
   } else {
-    // Cache first untuk aset lain
+    // Cache first for other assets
     event.respondWith(
       caches.match(request).then(cached => {
         return cached || fetch(request).catch(() =>
-          request.mode === 'navigate' ? caches.match('./offline.html') : null
+          request.mode === 'navigate' ? caches.match('/offline.html') : null
         );
       })
     );
