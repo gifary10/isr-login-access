@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="styles/main.css" rel="stylesheet">
     
-    
 </head>
 <body>
     <div class="container">
@@ -102,54 +101,89 @@
     </div>
 
     <script>
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful');
+                    // Setelah service worker terdaftar, tampilkan install button jika memenuhi syarat
+                    checkPWAInstallable();
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        });
+    }
 
-        // Add beforeinstallprompt event handler
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
-            
-            // Show install button (you can add this to your UI)
-            const installButton = document.createElement('button');
+    // PWA Installation Handler
+    let deferredPrompt;
+    let installButton = null;
+
+    function checkPWAInstallable() {
+        // Hanya tampilkan install button jika belum diinstall dan memenuhi kriteria PWA
+        if (!window.matchMedia('(display-mode: standalone)').matches) {
+            showInstallButton();
+        }
+    }
+
+    function showInstallButton() {
+        // Hanya buat button jika belum ada
+        if (!installButton) {
+            installButton = document.createElement('button');
             installButton.textContent = 'Install App';
-            installButton.className = 'btn btn-secondary position-fixed';
+            installButton.className = 'btn btn-primary position-fixed';
             installButton.style.bottom = '20px';
             installButton.style.right = '20px';
             installButton.style.zIndex = '1000';
+            installButton.style.display = 'none'; // Sembunyikan dulu
+            
             installButton.addEventListener('click', () => {
-                // Show the install prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
-                    deferredPrompt = null;
-                });
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(choiceResult => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                        } else {
+                            console.log('User dismissed the install prompt');
+                        }
+                        deferredPrompt = null;
+                        installButton.style.display = 'none';
+                    });
+                }
             });
+            
             document.body.appendChild(installButton);
+        }
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        deferredPrompt = e;
         
-        });
-    </script>
+        // Tampilkan install button
+        if (installButton) {
+            installButton.style.display = 'block';
+        } else {
+            showInstallButton();
+            installButton.style.display = 'block';
+        }
+        
+        // Optional: Log event untuk debugging
+        console.log('beforeinstallprompt event fired');
+    });
+
+    // Sembunyikan button jika app sudah diinstall
+    window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+        if (installButton) {
+            installButton.style.display = 'none';
+        }
+        deferredPrompt = null;
+    });
+</script>
     <script type="module" src="js/main.js"></script>
-    
 </body>
 </html>
-
-
