@@ -1,6 +1,6 @@
-// Versi cache otomatis berdasarkan timestamp atau hash
+// Ganti ke versi fix (pakai versi app, bisa diganti hash hasil build)
 const CACHE_PREFIX = 'login-access-';
-const CACHE_VERSION = Date.now(); // Bisa diganti hash file kalau mau lebih presisi
+const CACHE_VERSION = 'v1.0.3'; // naikin angka/hashing saat ada perubahan
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
@@ -22,7 +22,7 @@ const CDN_ASSETS = [
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbxmmdgHsgikOoJ_H5ppkFLSKIZfwmgQbcl2xMjon3naP-c-Oqf8t-q2X80tuvtYM-MF5w/exec';
 
-// Install: cache assets
+// Install: cache assets baru
 self.addEventListener('install', event => {
   event.waitUntil(
     (async () => {
@@ -38,19 +38,20 @@ self.addEventListener('install', event => {
         }
       }));
 
-      self.skipWaiting();
+      self.skipWaiting(); // langsung aktif tanpa tunggu
     })()
   );
 });
 
-// Activate: hapus semua cache lama kecuali versi terbaru
+// Activate: hapus cache lama
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.map(key => {
-          if (!key.startsWith(CACHE_PREFIX) || key === CACHE_NAME) return;
-          return caches.delete(key);
+          if (key !== CACHE_NAME && key.startsWith(CACHE_PREFIX)) {
+            return caches.delete(key);
+          }
         })
       )
     )
@@ -58,10 +59,11 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch: network first untuk API, cache first untuk asset lain
+// Fetch handler
 self.addEventListener('fetch', event => {
   const request = event.request;
 
+  // Untuk API → network first
   if (request.url.includes(API_URL)) {
     event.respondWith(
       (async () => {
@@ -70,30 +72,33 @@ self.addEventListener('fetch', event => {
           const response = await fetch(request);
           cache.put(request, response.clone());
           return response;
-        } catch (err) {
-          const cachedResponse = await cache.match(request);
-          return cachedResponse || new Response(JSON.stringify({ error: 'Offline' }), {
-            headers: { 'Content-Type': 'application/json' }
-          });
+        } catch {
+          return (await cache.match(request)) ||
+            new Response(JSON.stringify({ error: 'Offline' }), {
+              headers: { 'Content-Type': 'application/json' }
+            });
         }
       })()
     );
-  } else {
-    event.respondWith(
-      caches.match(request).then(async cached => {
-        if (cached) return cached;
-        try {
-          const response = await fetch(request);
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(request, response.clone());
-          return response;
-        } catch (err) {
-          if (request.mode === 'navigate') {
-            return caches.match('/offline.html');
-          }
-          return new Response('', { status: 404 });
-        }
-      })
-    );
+    return;
   }
+
+  // Untuk asset → stale-while-revalidate
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      const cachedResponse = await cache.match(request);
+      const fetchPromise = fetch(request).then(response => {
+        if (response && response.status === 200) {
+          cache.put(request, response.clone());
+        }
+        return response;
+      }).catch(() => null);
+
+      // kalau ada cache → langsung return, sambil update di belakang
+      return cachedResponse || fetchPromise || (request.mode === 'navigate'
+        ? caches.match('/offline.html')
+        : new Response('', { status: 404 }));
+    })()
+  );
 });
