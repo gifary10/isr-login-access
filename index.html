@@ -15,12 +15,6 @@
 </head>
 
 <body>
-    <!-- Running Text Marquee -->
-    <div class="running-text-container">
-        <div class="running-text">
-            Selamat datang di Aplikasi ISR – solusi pintar untuk akses mudah dan cepat. Aplikasi ini dirancang khusus untuk mempermudah manajemen login, menjaga keamanan data, dan memberikan pengalaman yang lebih praktis bagi pengguna.
-        </div>
-    </div>
 
     <!-- Help Modal -->
     <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
@@ -175,82 +169,147 @@
         initOffcanvas();
     </script>
 
-    <!-- PWA Installation Script -->
-    <script>
-        // Register service worker
+    <!-- Updated PWA Installation Script -->
+<script>
+  // Enhanced PWA installation and service worker registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register('./service-worker.js');
+        console.log('ServiceWorker registration successful with scope:', registration.scope);
+        
+        // Track the waiting service worker if there's an update
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateAvailable();
+            }
+          });
+        });
+        
+        // Check for updates periodically
+        setInterval(() => {
+          registration.update().catch(err => {
+            console.log('Update check failed:', err);
+          });
+        }, 60 * 60 * 1000); // Check every hour
+        
+        // Initialize PWA installation prompt
+        initPWAInstall();
+      } catch (err) {
+        console.log('ServiceWorker registration failed:', err);
+      }
+    });
+  }
+
+  // Enhanced PWA installation flow
+  let deferredPrompt;
+  let installButton = null;
+  let updateButton = null;
+
+  function initPWAInstall() {
+    // Only show install button if not running as PWA
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+      showInstallButton();
+    }
+
+    // Listen for beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install button if not already shown
+      if (installButton) {
+        installButton.style.display = 'block';
+      } else {
+        showInstallButton();
+      }
+      
+      // Log analytics or track the event
+      console.log('PWA installation available');
+    });
+
+    // Track app installation
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA was installed');
+      if (installButton) installButton.style.display = 'none';
+      deferredPrompt = null;
+      
+      // Log analytics or track the installation
+      trackEvent('PWA', 'installed');
+    });
+  }
+
+  function showInstallButton() {
+    if (!installButton) {
+      installButton = document.createElement('button');
+      installButton.textContent = 'Install App';
+      installButton.className = 'btn btn-primary position-fixed pwa-install-btn';
+      installButton.style.bottom = '20px';
+      installButton.style.right = '20px';
+      installButton.style.zIndex = '1000';
+      installButton.style.display = 'none';
+      installButton.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+      
+      installButton.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          
+          console.log(`User ${outcome} the install prompt`);
+          if (outcome === 'accepted') {
+            trackEvent('PWA', 'install_accepted');
+          } else {
+            trackEvent('PWA', 'install_declined');
+          }
+          
+          deferredPrompt = null;
+          installButton.style.display = 'none';
+        }
+      });
+      
+      document.body.appendChild(installButton);
+    }
+  }
+
+  function showUpdateAvailable() {
+    if (!updateButton) {
+      updateButton = document.createElement('button');
+      updateButton.textContent = 'Update Available';
+      updateButton.className = 'btn btn-success position-fixed pwa-update-btn';
+      updateButton.style.bottom = '70px';
+      updateButton.style.right = '20px';
+      updateButton.style.zIndex = '1000';
+      updateButton.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+      
+      updateButton.addEventListener('click', () => {
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                        checkPWAInstallable();
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
+          navigator.serviceWorker.getRegistration().then(reg => {
+            if (reg && reg.waiting) {
+              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+              window.location.reload();
+            }
+          });
         }
+        updateButton.style.display = 'none';
+      });
+      
+      document.body.appendChild(updateButton);
+    } else {
+      updateButton.style.display = 'block';
+    }
+  }
 
-        // PWA Installation Handler
-        let deferredPrompt;
-        let installButton = null;
+  function trackEvent(category, action) {
+    // Implement your analytics tracking here
+    console.log(`Tracking: ${category} - ${action}`);
+  }
 
-        function checkPWAInstallable() {
-            if (!window.matchMedia('(display-mode: standalone)').matches) {
-                showInstallButton();
-            }
-        }
-
-        function showInstallButton() {
-            if (!installButton) {
-                installButton = document.createElement('button');
-                installButton.textContent = 'Install App';
-                installButton.className = 'btn btn-primary position-fixed';
-                installButton.style.bottom = '20px';
-                installButton.style.right = '20px';
-                installButton.style.zIndex = '1000';
-                installButton.style.display = 'none';
-                
-                installButton.addEventListener('click', () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then(choiceResult => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('User accepted the install prompt');
-                            } else {
-                                console.log('User dismissed the install prompt');
-                            }
-                            deferredPrompt = null;
-                            installButton.style.display = 'none';
-                        });
-                    }
-                });
-                
-                document.body.appendChild(installButton);
-            }
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            if (installButton) {
-                installButton.style.display = 'block';
-            } else {
-                showInstallButton();
-                installButton.style.display = 'block';
-            }
-            
-            console.log('beforeinstallprompt event fired');
-        });
-
-        window.addEventListener('appinstalled', () => {
-            console.log('PWA was installed');
-            if (installButton) {
-                installButton.style.display = 'none';
-            }
-            deferredPrompt = null;
-        });
-    </script>
+  // Listen for controller change (app update)
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+</script>
 </body>
 </html>
