@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbzJnHvDqSml5Pf5GBDQroGcjpyGqAWI4grnmrFKyNQoVvqDC1I2HsuX1Iydf9pDRNaP/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbw-TVP8TIAbC4td5vtaE8d4SZ5AX7UZHZNHVHFc0L2hi79BAWdxxS_8z-KSsdXDI1E1/exec';
 
 // Optimized status and icon maps with less redundancy
 const STATUS_MAP = {
@@ -282,4 +282,5 @@ export function initOffcanvas() {
             noData.style.display = 'block';
         }
     });
+
 }
